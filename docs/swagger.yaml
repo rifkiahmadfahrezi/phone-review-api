@@ -1,0 +1,733 @@
+definitions:
+  controller.LoginInput:
+    properties:
+      Email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    type: object
+  controller.RegisterInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  controller.brandInput:
+    properties:
+      description:
+        type: string
+      logo_url:
+        type: string
+      name:
+        type: string
+    required:
+    - logo_url
+    - name
+    type: object
+  controller.changePasswordInput:
+    properties:
+      current_password:
+        type: string
+      new_password:
+        type: string
+    type: object
+  controller.deleteUserInput:
+    properties:
+      password:
+        type: string
+    type: object
+  controller.phoneInput:
+    properties:
+      brand_id:
+        type: integer
+      image_url:
+        type: string
+      model:
+        type: string
+      price:
+        type: integer
+      release_date:
+        type: string
+    type: object
+  controller.profileInput:
+    properties:
+      biodata:
+        type: string
+      birthday:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      image_url:
+        type: string
+    type: object
+  controller.userUpdate:
+    properties:
+      email:
+        type: string
+      username:
+        type: string
+    type: object
+  models.Brand:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      logo_url:
+        type: string
+      name:
+        type: string
+      phones:
+        items:
+          $ref: '#/definitions/models.Phone'
+        type: array
+      updated_at:
+        type: string
+    type: object
+  models.Phone:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      image_url:
+        type: string
+      model:
+        type: string
+      price:
+        type: integer
+      release_date:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.Profile:
+    properties:
+      biodata:
+        type: string
+      birthday:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: integer
+      image_url:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      profiles:
+        items:
+          $ref: '#/definitions/models.Profile'
+        type: array
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+paths:
+  /auth/change-password:
+    put:
+      description: changging current logged in user's password
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: body for changing user's password, user id is taken from the
+          authorization token
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.changePasswordInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerToken: []
+      summary: Change password
+      tags:
+      - Auth
+  /auth/login:
+    post:
+      description: Logging in to get jwt token to access admin or user api by roles.
+      parameters:
+      - description: the body to login a user choose using email or username
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login.
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      description: registering a user from public access.
+      parameters:
+      - description: the body to register a user
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.RegisterInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register a user.
+      tags:
+      - Auth
+  /auth/register-admin:
+    post:
+      description: registering a new account with admin role, only account with role
+        admin can access this route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: the body to register a admin
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.RegisterInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerToken: []
+      summary: Register a new account as admin role.
+      tags:
+      - Auth
+  /brands:
+    get:
+      description: Get a list of Phone brands.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Brand'
+            type: array
+      summary: Get all Phones brands.
+      tags:
+      - Brands
+    post:
+      description: Creating a new Brand data, only account with role admin can access
+        this route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: example JSON body to create a new Brand
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.brandInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Brand'
+      security:
+      - BearerToken: []
+      summary: Create New Brand
+      tags:
+      - Brands
+  /brands/{id}:
+    delete:
+      description: Delete a Brand by id
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Brand id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+      security:
+      - BearerToken: []
+      summary: Delete Brand by id .
+      tags:
+      - Brands
+    get:
+      description: Get Brand data by ID.
+      parameters:
+      - description: Brand id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Brand'
+            type: array
+      summary: Get single brand data by ID.
+      tags:
+      - Brands
+    put:
+      description: Update Brand data by id, only account with role admin can access
+        this route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Brand id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: tExample JSON body to update Brand data
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.brandInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Brand'
+      security:
+      - BearerToken: []
+      summary: Update Brand data.
+      tags:
+      - Brands
+  /brands/{id}/phones:
+    get:
+      description: Get all Phones data by brand id.
+      parameters:
+      - description: Brand id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Brand'
+            type: array
+      summary: Get phones data by Brand id.
+      tags:
+      - Brands
+  /phones:
+    get:
+      description: Get a list of Phone.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Phone'
+            type: array
+      summary: Get all Phones data.
+      tags:
+      - Phones
+    post:
+      description: Creating a new Phone data, only account with role admin can accsess
+        this route
+      parameters:
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: example JSON body to create a new Phone
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.phoneInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Phone'
+      security:
+      - BearerToken: []
+      summary: Create New Phone
+      tags:
+      - Phones
+  /phones/{id}:
+    delete:
+      description: Delete a Phone by id, only account with role admin can access this
+        route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Phone id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+      security:
+      - BearerToken: []
+      summary: Delete Phone by id .
+      tags:
+      - Phones
+    get:
+      description: Get a Phone by id.
+      parameters:
+      - description: phone id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Phone'
+      summary: Get Phone.
+      tags:
+      - Phones
+    put:
+      description: Update Phone data by id, only account with role admin can access
+        this route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Phone id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: tExample JSON body to update Phone data
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.phoneInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Phone'
+      security:
+      - BearerToken: []
+      summary: Update Phone data.
+      tags:
+      - Phones
+  /profiles:
+    post:
+      description: Creating a profile data for user, only registered user can access
+        this route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: example JSON body to create a profile for user, user_id is taken
+          from the authorization token
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.profileInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Profile'
+      security:
+      - BearerToken: []
+      summary: Create Profile for user
+      tags:
+      - Profiles
+    put:
+      description: Updating a profile data for user, only registered user can access
+        this route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: example JSON body to update a profile for user, user_id is taken
+          from the authorization token
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.profileInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Profile'
+      security:
+      - BearerToken: []
+      summary: Update Profile for user
+      tags:
+      - Profiles
+  /users:
+    delete:
+      description: Will delete the user account itself
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: the body to delete user's own account
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.deleteUserInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+      security:
+      - BearerToken: []
+      summary: Delete user's own account
+      tags:
+      - Users
+    get:
+      description: Get a list of account with 'user' role.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                type: string
+              type: array
+            type: object
+      summary: Get all account with user role.
+      tags:
+      - Users
+  /users/:
+    put:
+      description: update its own user data
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: tExample JSON body to update User data
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.userUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+      security:
+      - BearerToken: []
+      summary: Update User data.
+      tags:
+      - Users
+  /users/{id}:
+    delete:
+      description: Delete a User by id, only admin can access this route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                type: string
+              type: array
+            type: object
+      security:
+      - BearerToken: []
+      summary: Delete User by id .
+      tags:
+      - Users
+    get:
+      description: Get user data by ID.
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                type: string
+              type: array
+            type: object
+      summary: Get single user by ID.
+      tags:
+      - Users
+  /users/{id}/profile:
+    get:
+      description: Get all Users profile data by user id.
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+      summary: Get profiles data by User id.
+      tags:
+      - Users
+swagger: "2.0"
