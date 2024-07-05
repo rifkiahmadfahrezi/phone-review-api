@@ -7,39 +7,56 @@ import (
 	"log"
 
 	"github.com/joho/godotenv"
+	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func ConnectDatabase() *gorm.DB {
-	// host := "aws-0-ap-southeast-1.pooler.supabase.com"
-	// port := "6543"
-	// user := "postgres.qkhezuksjpypdrluzkpu"
-	// password := "dbphonereview123:)"
-	// dbname := "postgres"
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	dbProvider := utils.GetEnv("DB_PROVIDER", "mysql")
+	environment := utils.GetEnv("ENVIRONMENT", "development")
+
+	var db *gorm.DB
+
+	if environment == "development" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
 	}
 
-	host := utils.GetEnv("DB_HOST", "localhost")
+	host := utils.GetEnv("DB_HOST", "127.0.0.1")
 	port := utils.GetEnv("DB_PORT", "3306")
 	user := utils.GetEnv("DB_USER", "root")
 	password := utils.GetEnv("DB_PASSWORD", "password")
 	dbname := utils.GetEnv("DB_NAME", "db_phone_review")
 
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=require", host, user, password, dbname, port)
-	db, err := gorm.Open(postgres.New(postgres.Config{
-		DSN:                  dsn,
-		PreferSimpleProtocol: true, // disables implicit prepared statement usage
-	}), &gorm.Config{})
-	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
+	switch dbProvider {
+	case "postgre":
+		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=require TimeZone=Asia/Jakarta", host, user, password, dbname, port)
+		dbPsg, err := gorm.Open(postgres.New(postgres.Config{
+			DSN:                  dsn,
+			PreferSimpleProtocol: true, // disables implicit prepared statement usage
+		}), &gorm.Config{})
+		if err != nil {
+			log.Fatal("Failed to connect to database:", err)
+		}
+		db = dbPsg
+	default:
+		dsn := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, port, dbname)
+
+		dbGorm, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+		db = dbGorm
 	}
 
 	// Migrate the schema
-	err = db.AutoMigrate(
+	err := db.AutoMigrate(
 		&models.Role{},
 		&models.User{},
 		&models.Profile{},

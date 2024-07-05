@@ -7,7 +7,10 @@ require github.com/gin-gonic/gin v1.10.0
 require (
 	github.com/gin-contrib/cors v1.7.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	gorm.io/driver/mysql v1.5.7
 )
+
+require github.com/go-sql-driver/mysql v1.7.0 // indirect
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
