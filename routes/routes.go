@@ -69,12 +69,22 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	// profile routes
 	profileMiddlewareRoutes := r.Group("/profiles")
-	// ⬇ PUBLIC ROUTES
-
 	profileMiddlewareRoutes.Use(middleware.JwtAuthMiddleware())
 	// ⬇ REGISTERED ACCOUNT ONLY (user/admin)
 	// ID user diambil dari token
 	profileMiddlewareRoutes.POST("", controller.CreateProfile)
+
+	// role routes
+	roleMiddlewareRoutes := r.Group("/roles")
+	// ⬇ Hanya bisa diakses account dgn role 'admin' yg sudah login
+	roleMiddlewareRoutes.Use(middleware.JwtAuthMiddleware())
+	roleMiddlewareRoutes.Use(middleware.RoleMiddleware(db))
+	roleMiddlewareRoutes.GET("", controller.GetAllRoleData)
+	roleMiddlewareRoutes.GET("/:id", controller.GetRoleDataByID)
+	roleMiddlewareRoutes.POST("", controller.CreateRole)
+	roleMiddlewareRoutes.PUT("/:id", controller.UpdateRole)
+	roleMiddlewareRoutes.DELETE("/:id", controller.DeleteRoleByID)
+	roleMiddlewareRoutes.GET("/:id/users", controller.GetUsersDataByRoleId)
 
 	// brands route
 	brandsMiddlewareRoutes := r.Group("/brands")

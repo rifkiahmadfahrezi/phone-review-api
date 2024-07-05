@@ -73,6 +73,11 @@ definitions:
       image_url:
         type: string
     type: object
+  controller.roleInput:
+    properties:
+      name:
+        type: string
+    type: object
   controller.userUpdate:
     properties:
       email:
@@ -136,6 +141,21 @@ definitions:
         type: string
       user_id:
         type: integer
+    type: object
+  models.Role:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
     type: object
   models.User:
     properties:
@@ -670,6 +690,170 @@ paths:
       summary: Update Profile for user
       tags:
       - Profiles
+  /roles:
+    get:
+      description: Get a list of user's roles. only admin can access this route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Role'
+            type: array
+      security:
+      - BearerToken: []
+      summary: Get all  roles.
+      tags:
+      - Roles
+    post:
+      description: Creating a new Role data, only admin can access this route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: example JSON body to create a new Role
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.roleInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Role'
+      security:
+      - BearerToken: []
+      summary: Create New Role
+      tags:
+      - Roles
+  /roles/{id}:
+    delete:
+      description: Delete a Role by id, only admin can access this route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Role id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+      security:
+      - BearerToken: []
+      summary: Delete Role by id .
+      tags:
+      - Roles
+    get:
+      description: Get a role data by id. only admin can access this route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Role id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Role'
+            type: array
+      security:
+      - BearerToken: []
+      summary: Get role by ID.
+      tags:
+      - Roles
+    put:
+      description: Update Role data by id, only account with role admin can access
+        this route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Role id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: tExample JSON body to update Role data
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.roleInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Role'
+      security:
+      - BearerToken: []
+      summary: Update Role data.
+      tags:
+      - Roles
+  /roles/{id}/users:
+    get:
+      description: Get all Users data by role id. only admin can access this route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Role id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Role'
+            type: array
+      security:
+      - BearerToken: []
+      summary: Get users data by Role id.
+      tags:
+      - Roles
   /users:
     delete:
       description: Will delete the user account itself
