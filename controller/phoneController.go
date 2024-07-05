@@ -4,8 +4,10 @@ import (
 	"final-project/lib"
 	"final-project/models"
 	"final-project/utils"
+	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -51,8 +53,26 @@ func GetAllPhoneData(c *gin.Context) {
 	// get db from gin context
 	db := c.MustGet("db").(*gorm.DB)
 
+	// apply filtering
+	searchKeyword := c.Query("search")
+	sort := c.Query("sort")
+
+	query := db.Model(&models.Phone{})
+
+	if searchKeyword != "" {
+		q := fmt.Sprintf("%%%s%%", searchKeyword)
+		query.Where("name LIKE ?", q)
+	}
+
+	switch strings.ToLower(sort) {
+	case "desc":
+		query.Order("phone_id DESC")
+	default:
+		query.Order("phone_id ASC")
+	}
+
 	var phones_data []PhonesCompleteResponse
-	if err := db.Table("phones").
+	if err := query.Table("phones").
 		Select(`brands.name as brand_name, 
 				   phones.id as phone_id,
 				   brands.id as brand_id,
@@ -65,6 +85,16 @@ func GetAllPhoneData(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError,
 			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
 		return
+	}
+
+	// validsi jika data tidak ditemukan
+	if searchKeyword != "" || sort != "" {
+		if len(phones_data) == 0 {
+			emptydata := make([]string, 0)
+			c.JSON(http.StatusNotFound,
+				utils.ResponseJSON(lib.ErrMsgNotFound("phone"), http.StatusNotFound, emptydata))
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, utils.ResponseJSON("", http.StatusOK, phones_data))

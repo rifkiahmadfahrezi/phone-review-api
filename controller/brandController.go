@@ -37,12 +37,40 @@ func GetAllBrandData(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	var brands_data []models.Brand
 
-	err := db.Select("id", "logo_url", "name", "description", "created_at", "updated_at").Find(&brands_data).Error
+	// apply filtering
+	searchKeyword := c.Query("search")
+	sort := c.Query("sort")
+
+	query := db.Model(&models.Brand{})
+
+	if searchKeyword != "" {
+		q := fmt.Sprintf("%%%s%%", searchKeyword)
+		query.Where("name LIKE ?", q)
+	}
+
+	switch strings.ToLower(sort) {
+	case "desc":
+		query.Order("id DESC")
+	default:
+		query.Order("id ASC")
+	}
+
+	err := query.Select("id", "logo_url", "name", "description", "created_at", "updated_at").Find(&brands_data).Error
 	if err != nil {
 		emptydata := make([]string, 0)
 		c.JSON(http.StatusInternalServerError,
 			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, emptydata))
 		return
+	}
+
+	// validsi jika data tidak ada
+	if searchKeyword != "" || sort != "" {
+		if len(brands_data) == 0 {
+			emptydata := make([]string, 0)
+			c.JSON(http.StatusNotFound,
+				utils.ResponseJSON(lib.ErrMsgNotFound("brands"), http.StatusNotFound, emptydata))
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK,
@@ -119,6 +147,7 @@ func GetPhonesDataByBrandId(c *gin.Context) {
 
 	id := c.Param("id")
 	if err := db.Preload("Phones").Find(&brands, id).Error; err != nil {
+		fmt.Println(err.Error())
 		c.JSON(http.StatusNotFound,
 			utils.ResponseJSON(lib.ErrMsgNotFound("brand"), http.StatusNotFound, nil))
 		return

@@ -31,12 +31,40 @@ func GetAllRoleData(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	var roles_data []models.Role
 
-	err := db.Select("id", "name", "created_at", "updated_at").Find(&roles_data).Error
+	// apply filtering
+	searchKeyword := c.Query("search")
+	sort := c.Query("sort")
+
+	query := db.Model(&models.Role{})
+
+	if searchKeyword != "" {
+		q := fmt.Sprintf("%%%s%%", searchKeyword)
+		query.Where("name LIKE ?", q)
+	}
+
+	switch strings.ToLower(sort) {
+	case "desc":
+		query.Order("id DESC")
+	default:
+		query.Order("id ASC")
+	}
+
+	err := query.Select("id", "name", "created_at", "updated_at").Find(&roles_data).Error
 	if err != nil {
 		emptydata := make([]string, 0)
 		c.JSON(http.StatusInternalServerError,
 			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, emptydata))
 		return
+	}
+
+	// validsi jika data tidak ditemukan
+	if searchKeyword != "" || sort != "" {
+		if len(roles_data) == 0 {
+			emptydata := make([]string, 0)
+			c.JSON(http.StatusNotFound,
+				utils.ResponseJSON(lib.ErrMsgNotFound("role"), http.StatusNotFound, emptydata))
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK,

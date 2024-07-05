@@ -5,7 +5,9 @@ import (
 	"final-project/models"
 	"final-project/utils"
 	"final-project/utils/token"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -32,12 +34,40 @@ func GetAllUser(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	var users_data []models.User
 
-	err := db.Select("id", "username", "email", "created_at", "updated_at").Where("role_id != 2").Find(&users_data).Error
+	// apply filtering
+	searchKeyword := c.Query("search")
+	sort := c.Query("sort")
+
+	query := db.Model(&models.User{})
+
+	if searchKeyword != "" {
+		q := fmt.Sprintf("%%%s%%", searchKeyword)
+		query.Where("username LIKE ? OR email Like ?", q, q)
+	}
+
+	switch strings.ToLower(sort) {
+	case "desc":
+		query.Order("id DESC")
+	default:
+		query.Order("id ASC")
+	}
+
+	err := query.Select("id", "username", "email", "created_at", "updated_at").Where("role_id != 2").Find(&users_data).Error
 	if err != nil {
 		emptydata := make([]string, 0)
 		c.JSON(http.StatusInternalServerError,
 			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, emptydata))
 		return
+	}
+
+	// validsi jika data tidak ditemukan
+	if searchKeyword != "" || sort != "" {
+		if len(users_data) == 0 {
+			emptydata := make([]string, 0)
+			c.JSON(http.StatusNotFound,
+				utils.ResponseJSON(lib.ErrMsgNotFound("user"), http.StatusNotFound, emptydata))
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK,
