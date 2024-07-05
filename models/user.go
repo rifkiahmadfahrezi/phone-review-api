@@ -22,7 +22,7 @@ type User struct {
 	UpdatedAt time.Time `gorm:"not null" json:"updated_at"`
 	RoleID    uint      `gorm:"not null" json:"-"`
 	Role      Role      `gorm:"foreignKey:RoleID;default:1;" json:"-"`
-	Profiles  []Profile `gorm:"foreignKey:UserID;constraint:onDelete:CASCADE" json:"profiles"`
+	Profiles  []Profile `gorm:"foreignKey:UserID;constraint:onDelete:CASCADE" json:"profiles,omitempty"`
 	Reviews   []Review  `gorm:"foreignKey:UserID" json:"-"`
 	Comments  []Comment `gorm:"foreignKey:UserID" json:"-"`
 }

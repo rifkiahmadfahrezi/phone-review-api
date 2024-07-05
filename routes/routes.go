@@ -42,9 +42,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	authMiddlewareRoutes.PUT("/change-password", controller.ChangePassword)
 	// ⬇ ADMIN ONLY
 	authMiddlewareRoutes.Use(middleware.RoleMiddleware(db))
-	authMiddlewareRoutes.POST("/register-admin", controller.RegisterAdmin)
 
-	// users route
+	// untuk data account dgn role 'user'
 	userMiddlewareRoutes := r.Group("/users")
 	// ⬇ PUBLIC ROUTES
 	r.GET("/users", controller.GetAllUser)      // get user role accounts only
@@ -57,6 +56,16 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	// ⬇ For ADMIN ONLY
 	userMiddlewareRoutes.Use(middleware.RoleMiddleware(db))
 	userMiddlewareRoutes.DELETE("/:id", controller.DeleteUserById)
+
+	// untuk data account dgn role 'admins'
+	adminMiddlewareRoutes := r.Group("/admins")
+	// ⬇ Hanya bisa diakses account dgn role 'admin' yg sudah login
+	adminMiddlewareRoutes.Use(middleware.JwtAuthMiddleware())
+	adminMiddlewareRoutes.Use(middleware.RoleMiddleware(db))
+	adminMiddlewareRoutes.GET("", controller.GetAllAdmins)
+	adminMiddlewareRoutes.GET("/:id", controller.GetAdminByID)
+	adminMiddlewareRoutes.GET("/:id/profile", controller.GetAdminProfileByID)
+	adminMiddlewareRoutes.POST("/register", controller.RegisterAdmin)
 
 	// profile routes
 	profileMiddlewareRoutes := r.Group("/profiles")

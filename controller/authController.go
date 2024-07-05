@@ -191,59 +191,6 @@ func ChangePassword(c *gin.Context) {
 	c.JSON(http.StatusOK, utils.ResponseJSON("Password berhasil diperbarui", http.StatusOK, nil))
 }
 
-// Register Admmin godoc
-// @Summary Register a new account as admin role.
-// @Description registering a new account with admin role, only account with role admin can access this route
-// @Tags Auth
-// @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
-// @Security BearerToken
-// @Param Body body RegisterInput true "the body to register a admin"
-// @Produce json
-// @Success 200 {object} map[string]interface{}
-// @Router /auth/register-admin [post]
-func RegisterAdmin(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-	var input RegisterInput
-
-	if err := c.ShouldBindJSON(&input); err != nil {
-		errorMessage := utils.CustomBindError(err)
-		c.JSON(http.StatusBadRequest, utils.ResponseJSON(errorMessage, http.StatusBadRequest, nil))
-		return
-	}
-
-	u := models.User{}
-
-	u.Username = input.Username
-	u.Email = input.Email
-	u.Password = input.Password
-
-	// cek role user yg sedang di register (in case role admin mau menambahkan admin baru)
-	role_id, err := GetUserRoleId(c)
-	if err != nil || role_id != 2 { // role 2 = admin
-		c.JSON(http.StatusInternalServerError,
-			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
-	}
-
-	u.RoleID = 2 // set default role (user)
-
-	_, err = u.SaveUser(db)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError,
-			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
-		return
-	}
-
-	user := map[string]string{
-		"username": input.Username,
-		"email":    input.Email,
-	}
-
-	c.JSON(http.StatusOK, utils.ResponseJSON("Register admin berhasil", http.StatusOK, map[string]any{
-		"user": user,
-	}))
-
-}
-
 func GetUserRoleId(c *gin.Context) (uint, error) {
 	db := c.MustGet("db").(*gorm.DB)
 	userID, err := token.ExtractTokenID(c)

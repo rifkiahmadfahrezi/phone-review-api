@@ -164,6 +164,120 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
 paths:
+  /admins:
+    get:
+      description: Get a list of account with 'admin' role, only role admin can acces
+        this route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                type: string
+              type: array
+            type: object
+      security:
+      - BearerToken: []
+      summary: Get all account with 'admin' role.
+      tags:
+      - Admins
+  /admins/{id}:
+    get:
+      description: Get admin data by ID. only role admin can acces to this route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: admin id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                type: string
+              type: array
+            type: object
+      security:
+      - BearerToken: []
+      summary: Get single admin by ID.
+      tags:
+      - Admins
+  /admins/{id}/profile:
+    get:
+      description: Get all Admins profile data by admin id. only admin can access
+        this route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: admin id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+      security:
+      - BearerToken: []
+      summary: Get profiles data by Admin id.
+      tags:
+      - Admins
+  /admins/register:
+    post:
+      description: registering a new account with admin role, only account with role
+        admin can access this route
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: the body to register a admin
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.RegisterInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerToken: []
+      summary: Register a new account as admin role.
+      tags:
+      - Admins
   /auth/change-password:
     put:
       description: changging current logged in user's password
@@ -233,35 +347,6 @@ paths:
             additionalProperties: true
             type: object
       summary: Register a user.
-      tags:
-      - Auth
-  /auth/register-admin:
-    post:
-      description: registering a new account with admin role, only account with role
-        admin can access this route
-      parameters:
-      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: the body to register a admin
-        in: body
-        name: Body
-        required: true
-        schema:
-          $ref: '#/definitions/controller.RegisterInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerToken: []
-      summary: Register a new account as admin role.
       tags:
       - Auth
   /brands:

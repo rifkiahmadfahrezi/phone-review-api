@@ -32,7 +32,7 @@ func GetAllUser(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	var users_data []models.User
 
-	err := db.Preload("Profiles").Where("role_id = 1").Find(&users_data).Error
+	err := db.Select("id", "username", "email", "created_at", "updated_at").Where("role_id != 2").Find(&users_data).Error
 	if err != nil {
 		emptydata := make([]string, 0)
 		c.JSON(http.StatusInternalServerError,
@@ -57,7 +57,7 @@ func GetUserByID(c *gin.Context) {
 	id := c.Param("id")
 	db := c.MustGet("db").(*gorm.DB)
 
-	if err := db.Preload("Profiles").First(&user_data, id).Error; err != nil {
+	if err := db.Select("id", "username", "email", "created_at", "updated_at").Where("role_id != 2").First(&user_data, id).Error; err != nil {
 		c.JSON(http.StatusNotFound,
 			utils.ResponseJSON(lib.ErrMsgNotFound("user"), http.StatusNotFound, nil))
 		return
@@ -223,7 +223,7 @@ func GetUserProfileByID(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
 	userID := c.Param("id")
-	if err := db.Preload("Profiles").First(&user, userID).Error; err != nil {
+	if err := db.Preload("Profiles").Where("role_id != 2").First(&user, userID).Error; err != nil {
 		c.JSON(http.StatusNotFound,
 			utils.ResponseJSON(lib.ErrMsgNotFound("user"), http.StatusNotFound, nil))
 		return
