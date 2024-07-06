@@ -120,8 +120,16 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	phonesMiddlewareRoutes.PUT("/:id/specification", controller.UpdateSpecification)
 
 	reviewsMiddlewareRoutes := r.Group("/reviews")
+	// public comments route
+	reviewsMiddlewareRoutes.GET("/:id/comments", controller.GetCommentsDataByReviewId)
 	reviewsMiddlewareRoutes.Use(middleware.JwtAuthMiddleware())
 	reviewsMiddlewareRoutes.DELETE("/:id", controller.DeleteReviewById)
+	reviewsMiddlewareRoutes.POST("/:id/comments", controller.CreateComment)
+	reviewsMiddlewareRoutes.PUT("/:id/comments/:com_id", controller.UpdateComment)
+
+	commentMiddlewareRoutes := r.Group("/comments")
+	commentMiddlewareRoutes.Use(middleware.JwtAuthMiddleware())
+	commentMiddlewareRoutes.DELETE("/:id", controller.DeleteCommentByID)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

@@ -42,6 +42,13 @@ definitions:
       new_password:
         type: string
     type: object
+  controller.commentInput:
+    properties:
+      content:
+        type: string
+    required:
+    - content
+    type: object
   controller.deleteUserInput:
     properties:
       password:
@@ -617,6 +624,34 @@ paths:
       summary: Get phones data by Brand id.
       tags:
       - Brands
+  /comments/{id}:
+    delete:
+      description: Delete a Comment by id, (user ID is taken from the JWT token)
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Comment id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+      security:
+      - BearerToken: []
+      summary: Delete Comment by id .
+      tags:
+      - Comments
   /phones:
     get:
       description: Get a list of Phone.
@@ -993,6 +1028,98 @@ paths:
       security:
       - BearerToken: []
       summary: Delete review by ID
+      tags:
+      - Reviews
+  /reviews/{id}/comments:
+    get:
+      description: Get all Comments data by review id.
+      parameters:
+      - description: Review id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Review'
+            type: array
+      summary: Get comments data by Review id.
+      tags:
+      - Reviews
+    post:
+      description: Creating a comment data, (user ID is taken from the JWT token)
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: review id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: example JSON body to create a comment, user_id is taken from
+          the authorization token
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.commentInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Comment'
+      security:
+      - BearerToken: []
+      summary: Create Comment
+      tags:
+      - Reviews
+  /reviews/{id}/comments/{com_id}:
+    put:
+      description: This route will update comment data, will only be able to update
+        data related to the logged in user (user ID is taken from the JWT token)
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: review id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: comment id
+        in: path
+        name: com_id
+        required: true
+        type: string
+      - description: example JSON body to update a comment, user_id is taken from
+          the authorization token
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.commentInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Comment'
+      security:
+      - BearerToken: []
+      summary: Update Comment
       tags:
       - Reviews
   /roles:

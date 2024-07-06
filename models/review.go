@@ -12,5 +12,5 @@ type Review struct {
 	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 	UserID    uint      `gorm:"not null" json:"user_id"`
 	PhoneID   uint      `gorm:"not null" json:"phone_id"`
-	Comments  []Comment `gorm:"foreignKey:ReviewID" json:"comments"`
+	Comments  []Comment `gorm:"foreignKey:ReviewID;constraint:onDelete:CASCADE" json:"comments,omitempty"`
 }

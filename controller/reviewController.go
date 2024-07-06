@@ -215,13 +215,17 @@ func DeleteReviewById(c *gin.Context) {
 	}
 	var review models.Review
 	// cek apakah review dengan id tsb ada
-	if err := db.Where("id = ? AND user_id = ?", reviewID, userID).First(&review).Error; err != nil {
+	if err := db.Where("id = ? AND user_id = ?", reviewID, userID).Find(&review).Error; err != nil {
 		c.JSON(http.StatusBadRequest,
 			utils.ResponseJSON(err.Error(), http.StatusBadRequest, nil))
 		return
 	}
 
-	db.Delete(&review)
+	if err := db.Where("id = ? AND user_id = ?", reviewID, userID).Delete(&review).Error; err != nil {
+		c.JSON(http.StatusBadRequest,
+			utils.ResponseJSON(err.Error(), http.StatusBadRequest, nil))
+		return
+	}
 	c.JSON(http.StatusOK,
 		utils.ResponseJSON(lib.MsgDeleted("review"), http.StatusOK, nil))
 }
