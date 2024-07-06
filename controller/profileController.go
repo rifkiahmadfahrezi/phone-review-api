@@ -5,7 +5,6 @@ import (
 	"final-project/models"
 	"final-project/utils"
 	"final-project/utils/token"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -15,10 +14,10 @@ import (
 
 type profileInput struct {
 	Biodata  string    `json:"biodata"`
-	ImageURL string    `json:"image_url" bind:"url"`
+	ImageURL string    `json:"image_url" binding:"url"`
 	FullName string    `json:"full_name"`
 	Birthday time.Time `json:"birthday"`
-	Email    string    `json:"email" bind:"email"`
+	Email    string    `json:"email" binding:"email"`
 }
 
 // Create Profile for user godoc
@@ -45,11 +44,22 @@ func CreateProfile(c *gin.Context) {
 		}
 		return
 	}
-
-	fmt.Println("okokok")
-
 	// ambil user id
 	userID, err := token.ExtractTokenID(c)
+	// cek data Profile sudah ada atau blm
+	var profile []models.Profile
+	if err := db.Where("user_id = ?", userID).Find(&profile).Error; err != nil {
+		c.JSON(http.StatusBadRequest,
+			utils.ResponseJSON(err.Error(), http.StatusBadRequest, nil))
+		return
+	}
+
+	if len(profile) > 0 {
+		c.JSON(http.StatusBadRequest,
+			utils.ResponseJSON(lib.MsgAlreadyExist("profile"), http.StatusBadRequest, nil))
+		return
+	}
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError,
 			utils.ResponseJSON("Gagal mengambil id user", http.StatusInternalServerError, nil))

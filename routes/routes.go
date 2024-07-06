@@ -104,12 +104,16 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	// ⬇ PUBLIC ROUTES
 	r.GET("/phones/:id", controller.GetPhoneById)
 	r.GET("/phones", controller.GetAllPhoneData)
+	r.GET("/phones/:id/specification", controller.GetPhonesSpecByPhoneId)
 	phonesMiddlewareRoutes.Use(middleware.JwtAuthMiddleware())
 	// ⬇ ADMIN ONLY
 	phonesMiddlewareRoutes.Use(middleware.RoleMiddleware(db))
 	phonesMiddlewareRoutes.POST("", controller.CreatePhoneData)
 	phonesMiddlewareRoutes.PUT("/:id", controller.UpdatePhoneData)
 	phonesMiddlewareRoutes.DELETE("/:id", controller.DeletePhoneData)
+	// create & update phone specification
+	phonesMiddlewareRoutes.POST("/:id/specification", controller.CreateSpecification)
+	phonesMiddlewareRoutes.PUT("/:id/specification", controller.UpdateSpecification)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

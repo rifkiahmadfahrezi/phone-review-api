@@ -313,3 +313,27 @@ func isPhoneInputDataValid(c *gin.Context, data phoneInput) bool {
 
 	return true
 }
+
+// Get phones specification by phone ID godoc
+// @Summary Get specification data by Phone id.
+// @Description Get all Phones data by phone id.
+// @Tags Phones
+// @Produce json
+// @Param id path string true "Phone id"
+// @Success 200 {object} []models.Phone
+// @Router /phones/{id}/specification [get]
+func GetPhonesSpecByPhoneId(c *gin.Context) {
+	var phones []models.Phone
+
+	db := c.MustGet("db").(*gorm.DB)
+
+	id := c.Param("id")
+	if err := db.Preload("Specifications").Find(&phones, id).Error; err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusNotFound,
+			utils.ResponseJSON(lib.ErrMsgNotFound("phone"), http.StatusNotFound, nil))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.ResponseJSON("", http.StatusOK, phones))
+}

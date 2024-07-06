@@ -708,6 +708,134 @@ const docTemplate = `{
                 }
             }
         },
+        "/phones/{id}/specification": {
+            "get": {
+                "description": "Get all Phones data by phone id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Phones"
+                ],
+                "summary": "Get specification data by Phone id.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Phone id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Phone"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "Creating a specification data for phone, only admin can access this route",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Phones"
+                ],
+                "summary": "Update Specification for phone",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "phone id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "example JSON body to update a specification for phone",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.specificationInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Specification"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "Creating a specification data for phone, only admin can access this route",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Phones"
+                ],
+                "summary": "Create Specification for phone",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Phone id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "example JSON body to create a specification for phone",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.specificationInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Specification"
+                        }
+                    }
+                }
+            }
+        },
         "/profiles": {
             "put": {
                 "security": [
@@ -1396,6 +1524,40 @@ const docTemplate = `{
                 }
             }
         },
+        "controller.specificationInput": {
+            "type": "object",
+            "required": [
+                "battery",
+                "camera",
+                "memory",
+                "network",
+                "operating_system",
+                "storage"
+            ],
+            "properties": {
+                "additional_feature": {
+                    "type": "string"
+                },
+                "battery": {
+                    "type": "string"
+                },
+                "camera": {
+                    "type": "integer"
+                },
+                "memory": {
+                    "type": "integer"
+                },
+                "network": {
+                    "type": "string"
+                },
+                "operating_system": {
+                    "type": "string"
+                },
+                "storage": {
+                    "type": "integer"
+                }
+            }
+        },
         "controller.userUpdate": {
             "type": "object",
             "properties": {
@@ -1457,6 +1619,12 @@ const docTemplate = `{
                 "release_date": {
                     "type": "string"
                 },
+                "specification": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Specification"
+                    }
+                },
                 "updated_at": {
                     "type": "string"
                 }
@@ -1514,6 +1682,44 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.User"
                     }
+                }
+            }
+        },
+        "models.Specification": {
+            "type": "object",
+            "properties": {
+                "additional_feature": {
+                    "type": "string"
+                },
+                "battery": {
+                    "type": "string"
+                },
+                "camera": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "memory": {
+                    "type": "integer"
+                },
+                "network": {
+                    "type": "string"
+                },
+                "operating_system": {
+                    "type": "string"
+                },
+                "phone_id": {
+                    "type": "integer"
+                },
+                "storage": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },
