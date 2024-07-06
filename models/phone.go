@@ -13,7 +13,7 @@ type Phone struct {
 	CreatedAt      time.Time       `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt      time.Time       `gorm:"autoUpdateTime" json:"updated_at"`
 	BrandID        uint            `gorm:"not null" json:"-"`
-	Reviews        []Review        `gorm:"foreignKey:PhoneID" json:"-"`
+	Reviews        []Review        `gorm:"foreignKey:PhoneID" json:"reviews,omitempty"`
 	Specifications []Specification `gorm:"foreignKey:PhoneID;constraint:onDelete:CASCADE" json:"specification,omitempty"`
 }
 

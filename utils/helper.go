@@ -37,6 +37,10 @@ func CustomBindError(err error) string {
 				errorMessages = append(errorMessages, fmt.Sprintf("Field %s harus merupakan email yang valid", err.Field()))
 			case "url":
 				errorMessages = append(errorMessages, fmt.Sprintf("Field %s harus merupakan url yang valid", err.Field()))
+			case "min":
+				errorMessages = append(errorMessages, fmt.Sprintf("Field %s harus memiliki nilai minimal %s", err.Field(), err.Param()))
+			case "max":
+				errorMessages = append(errorMessages, fmt.Sprintf("Field %s harus memiliki nilai maksimal %s", err.Field(), err.Param()))
 			default:
 				errorMessages = append(errorMessages, fmt.Sprintf("Field %s invalid", err.Field()))
 			}

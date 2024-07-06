@@ -708,6 +708,134 @@ const docTemplate = `{
                 }
             }
         },
+        "/phones/{id}/reviews": {
+            "get": {
+                "description": "Get all Reviews data by phone id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Phones"
+                ],
+                "summary": "Get reviews data by Phone id.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Phone id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Phone"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "This route will update review data , user ID is taken from the JWT token",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Phones"
+                ],
+                "summary": "Update Review for phone",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "phone id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "example JSON body to update a review for phone",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.reviewInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Review"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "This route will create review data , user ID is taken from the JWT token",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Phones"
+                ],
+                "summary": "Create New Review",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Phone id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "example JSON body to create a new Review",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.reviewInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Review"
+                        }
+                    }
+                }
+            }
+        },
         "/phones/{id}/specification": {
             "get": {
                 "description": "Get all Phones data by phone id.",
@@ -915,6 +1043,50 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.Profile"
+                        }
+                    }
+                }
+            }
+        },
+        "/reviews/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "This route will delete review data, based on the review ID and will only be able to delete data related to the logged in user (user ID is taken from the JWT token)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "Delete review by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "review id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Review"
+                            }
                         }
                     }
                 }
@@ -1516,6 +1688,23 @@ const docTemplate = `{
                 }
             }
         },
+        "controller.reviewInput": {
+            "type": "object",
+            "required": [
+                "content",
+                "rating"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "rating": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 1
+                }
+            }
+        },
         "controller.roleInput": {
             "type": "object",
             "properties": {
@@ -1598,6 +1787,29 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Comment": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "review_id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.Phone": {
             "type": "object",
             "properties": {
@@ -1618,6 +1830,12 @@ const docTemplate = `{
                 },
                 "release_date": {
                     "type": "string"
+                },
+                "reviews": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Review"
+                    }
                 },
                 "specification": {
                     "type": "array",
@@ -1653,6 +1871,38 @@ const docTemplate = `{
                 },
                 "image_url": {
                     "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Review": {
+            "type": "object",
+            "properties": {
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Comment"
+                    }
+                },
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "phone_id": {
+                    "type": "integer"
+                },
+                "rating": {
+                    "type": "integer"
                 },
                 "updated_at": {
                     "type": "string"

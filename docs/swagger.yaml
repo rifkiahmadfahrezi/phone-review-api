@@ -73,6 +73,18 @@ definitions:
       image_url:
         type: string
     type: object
+  controller.reviewInput:
+    properties:
+      content:
+        type: string
+      rating:
+        maximum: 5
+        minimum: 1
+        type: integer
+    required:
+    - content
+    - rating
+    type: object
   controller.roleInput:
     properties:
       name:
@@ -128,6 +140,21 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.Comment:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      review_id:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
   models.Phone:
     properties:
       created_at:
@@ -142,6 +169,10 @@ definitions:
         type: integer
       release_date:
         type: string
+      reviews:
+        items:
+          $ref: '#/definitions/models.Review'
+        type: array
       specification:
         items:
           $ref: '#/definitions/models.Specification'
@@ -165,6 +196,27 @@ definitions:
         type: integer
       image_url:
         type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.Review:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/models.Comment'
+        type: array
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      phone_id:
+        type: integer
+      rating:
+        type: integer
       updated_at:
         type: string
       user_id:
@@ -686,6 +738,91 @@ paths:
       summary: Update Phone data.
       tags:
       - Phones
+  /phones/{id}/reviews:
+    get:
+      description: Get all Reviews data by phone id.
+      parameters:
+      - description: Phone id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Phone'
+            type: array
+      summary: Get reviews data by Phone id.
+      tags:
+      - Phones
+    post:
+      description: This route will create review data , user ID is taken from the
+        JWT token
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Phone id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: example JSON body to create a new Review
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.reviewInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Review'
+      security:
+      - BearerToken: []
+      summary: Create New Review
+      tags:
+      - Phones
+    put:
+      description: This route will update review data , user ID is taken from the
+        JWT token
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: phone id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: example JSON body to update a review for phone
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.reviewInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Review'
+      security:
+      - BearerToken: []
+      summary: Update Review for phone
+      tags:
+      - Phones
   /phones/{id}/specification:
     get:
       description: Get all Phones data by phone id.
@@ -828,6 +965,36 @@ paths:
       summary: Update Profile for user
       tags:
       - Profiles
+  /reviews/{id}:
+    delete:
+      description: This route will delete review data, based on the review ID and
+        will only be able to delete data related to the logged in user (user ID is
+        taken from the JWT token)
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: review id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Review'
+            type: array
+      security:
+      - BearerToken: []
+      summary: Delete review by ID
+      tags:
+      - Reviews
   /roles:
     get:
       description: Get a list of user's roles. only admin can access this route

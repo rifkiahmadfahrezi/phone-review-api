@@ -105,7 +105,11 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	r.GET("/phones/:id", controller.GetPhoneById)
 	r.GET("/phones", controller.GetAllPhoneData)
 	r.GET("/phones/:id/specification", controller.GetPhonesSpecByPhoneId)
+	r.GET("/phones/:id/reviews", controller.GetReviewsDataByPhoneId)
 	phonesMiddlewareRoutes.Use(middleware.JwtAuthMiddleware())
+	// ⬇ logged in account only (user/admin)
+	phonesMiddlewareRoutes.POST("/:id/reviews", controller.CreateReview)
+	phonesMiddlewareRoutes.PUT("/:id/reviews", controller.UpdateReview)
 	// ⬇ ADMIN ONLY
 	phonesMiddlewareRoutes.Use(middleware.RoleMiddleware(db))
 	phonesMiddlewareRoutes.POST("", controller.CreatePhoneData)
@@ -114,6 +118,10 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	// create & update phone specification
 	phonesMiddlewareRoutes.POST("/:id/specification", controller.CreateSpecification)
 	phonesMiddlewareRoutes.PUT("/:id/specification", controller.UpdateSpecification)
+
+	reviewsMiddlewareRoutes := r.Group("/reviews")
+	reviewsMiddlewareRoutes.Use(middleware.JwtAuthMiddleware())
+	reviewsMiddlewareRoutes.DELETE("/:id", controller.DeleteReviewById)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
