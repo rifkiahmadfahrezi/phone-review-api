@@ -40,6 +40,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	// ⬇ REGISTERED ACCOUNT ONLY (user/admin)
 	// ID untuk change password diambil dari token
 	authMiddlewareRoutes.PUT("/change-password", controller.ChangePassword)
+	authMiddlewareRoutes.POST("/logout", controller.Logout)
 	// ⬇ ADMIN ONLY
 	authMiddlewareRoutes.Use(middleware.RoleMiddleware(db))
 
@@ -49,6 +50,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	r.GET("/users", controller.GetAllUser)      // get user role accounts only
 	r.GET("/users/:id", controller.GetUserByID) // get user role accounts only
 	r.GET("/users/:id/profile", controller.GetUserProfileByID)
+	r.GET("/users/:id/reviews", controller.GetUserReviewByID)
 	userMiddlewareRoutes.Use(middleware.JwtAuthMiddleware())
 	// ⬇ For registered account only (user/admin)
 	userMiddlewareRoutes.PUT("", controller.UpdateUser)
@@ -65,6 +67,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	adminMiddlewareRoutes.GET("", controller.GetAllAdmins)
 	adminMiddlewareRoutes.GET("/:id", controller.GetAdminByID)
 	adminMiddlewareRoutes.GET("/:id/profile", controller.GetAdminProfileByID)
+	adminMiddlewareRoutes.GET("/:id/reviews", controller.GetAdminReviewByID)
 	adminMiddlewareRoutes.POST("/register", controller.RegisterAdmin)
 
 	// profile routes

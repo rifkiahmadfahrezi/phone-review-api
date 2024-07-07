@@ -169,3 +169,28 @@ func GetAdminProfileByID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, utils.ResponseJSON("", http.StatusOK, user))
 }
+
+// Get reviews data by User ID godoc
+// @Summary Get reviews data by User id. (ADMIN ONLY)
+// @Description Get all Users review data by user id if user not create review yet the review will not appear
+// @Tags Admins
+// @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
+// @Security BearerToken
+// @Produce json
+// @Param id path string true "user id"
+// @Success 200 {object} []models.User
+// @Router /admins/{id}/reviews [get]
+func GetAdminReviewByID(c *gin.Context) {
+	var user models.User
+
+	db := c.MustGet("db").(*gorm.DB)
+
+	userID := c.Param("id")
+	if err := db.Preload("Reviews").Where("role_id = 2").Find(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound,
+			utils.ResponseJSON(lib.ErrMsgNotFound("user"), http.StatusNotFound, nil))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.ResponseJSON("", http.StatusOK, user))
+}

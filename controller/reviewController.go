@@ -84,11 +84,17 @@ func CreateReview(c *gin.Context) {
 	// cek apakah user sudah memberikan review ke phone dengan id (phoneID) atau belm
 	var rev []models.Review
 	if err := db.Where("phone_id = ? AND user_id = ?", phoneID, userID).First(&rev).Error; err != nil {
-		c.JSON(http.StatusInternalServerError,
-			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
-		return
+		// jika data tidak ditemukan berarti user belum memberikan review terhadap phone ini
+		// dan user boleh menambahkan reviewnya
+		if err.Error() != "record not found" {
+			c.JSON(http.StatusInternalServerError,
+				utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
+			return
+		}
 	}
 
+	// jika data ditemukan berarti user sudah memberikan review terhadap phone ini
+	// dan user tidak boleh menambahkan reviewnya
 	if len(rev) > 0 {
 		msg := fmt.Sprintf("user (%d) sudah memberikan review ke phone (%d)", userID, phoneID)
 		c.JSON(http.StatusBadRequest,
@@ -184,7 +190,7 @@ func UpdateReview(c *gin.Context) {
 
 // Get reviews data by Phone data ID godoc
 // @Summary Get reviews data by Phone id. (PUBLIC)
-// @Description Get all Reviews data by phone id.
+// @Description Get all Reviews data by phone id. if reviews data is empty, the review data will not be displayed
 // @Tags Phones
 // @Produce json
 // @Param id path string true "Phone id"
@@ -237,8 +243,9 @@ func DeleteReviewById(c *gin.Context) {
 	}
 
 	if len(review) == 0 {
+		msg := fmt.Sprintf("data review(%s) dari user (%d) tidak ditemukan", reviewID, userID)
 		c.JSON(http.StatusNotFound,
-			utils.ResponseJSON(lib.ErrMsgNotFound("review"), http.StatusNotFound, nil))
+			utils.ResponseJSON(msg, http.StatusNotFound, nil))
 		return
 	}
 

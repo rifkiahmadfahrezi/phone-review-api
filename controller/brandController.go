@@ -127,7 +127,11 @@ func CreateBrand(c *gin.Context) {
 		LogoURL:     input.LogoUrl,
 	}
 
-	db.Create(&brand_data)
+	if err := db.Create(&brand_data).Error; err != nil {
+		c.JSON(http.StatusInternalServerError,
+			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
+		return
+	}
 
 	c.JSON(http.StatusOK, utils.ResponseJSON(lib.MsgAdded("brand"), http.StatusOK, brand_data))
 }

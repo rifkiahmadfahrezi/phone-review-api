@@ -1,7 +1,7 @@
 definitions:
   controller.LoginInput:
     properties:
-      Email:
+      email:
         type: string
       password:
         type: string
@@ -15,8 +15,10 @@ definitions:
       email:
         type: string
       password:
+        minLength: 5
         type: string
       username:
+        minLength: 5
         type: string
     required:
     - email
@@ -279,6 +281,10 @@ definitions:
         items:
           $ref: '#/definitions/models.Profile'
         type: array
+      reviews:
+        items:
+          $ref: '#/definitions/models.Review'
+        type: array
       updated_at:
         type: string
       username:
@@ -379,6 +385,35 @@ paths:
       summary: Get profiles data by Admin id. (admin only)
       tags:
       - Admins
+  /admins/{id}/reviews:
+    get:
+      description: Get all Users review data by user id if user not create review
+        yet the review will not appear
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+      security:
+      - BearerToken: []
+      summary: Get reviews data by User id. (ADMIN ONLY)
+      tags:
+      - Admins
   /admins/register:
     post:
       description: registering a new account with admin role, only account with role
@@ -458,11 +493,33 @@ paths:
       summary: Login.
       tags:
       - Auth
+  /auth/logout:
+    post:
+      description: Simple logout for (user/admin)
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerToken: []
+      summary: logout (ADMIN AND USER)
+      tags:
+      - Auth
   /auth/register:
     post:
       description: registering a user from public access.
       parameters:
-      - description: the body to register a user
+      - description: the body to register a user, username min 5 characters
         in: body
         name: Body
         required: true
@@ -624,7 +681,8 @@ paths:
       - Brands
   /comments/{id}:
     delete:
-      description: Delete a Comment by id, (user ID is taken from the JWT token)
+      description: Delete a Comment by id, (user ID is taken from the JWT token so
+        only loogged in user can delete its own coment)
       parameters:
       - description: 'Authorization : ''Bearer <insert_your_token_here>'''
         in: header
@@ -775,7 +833,8 @@ paths:
       - Phones
   /phones/{id}/reviews:
     get:
-      description: Get all Reviews data by phone id.
+      description: Get all Reviews data by phone id. if reviews data is empty, the
+        review data will not be displayed
       parameters:
       - description: Phone id
         in: path
@@ -860,7 +919,8 @@ paths:
       - Phones
   /phones/{id}/specification:
     get:
-      description: Get all Phones data by phone id.
+      description: Get Phone specifiction data by phone id. if phone's specification
+        data empty, the spec data will not be displayed
       parameters:
       - description: Phone id
         in: path
@@ -1417,7 +1477,8 @@ paths:
   /users/{id}/profile:
     get:
       description: Get all Users profile data by user id.this will only display account
-        with role "user", if admin not create profile yet the profile will not appear
+        with role "user", if  user not create profile yet the profile will not be
+        display
       parameters:
       - description: user id
         in: path
@@ -1434,6 +1495,28 @@ paths:
               $ref: '#/definitions/models.User'
             type: array
       summary: Get profiles data by User id. (PUBLIC)
+      tags:
+      - Users
+  /users/{id}/reviews:
+    get:
+      description: Get all Users review data by user id if user not create review
+        yet the review will not appear
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+      summary: Get reviews data by User id. (PUBLIC)
       tags:
       - Users
 swagger: "2.0"

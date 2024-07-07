@@ -14,7 +14,7 @@ import (
 
 type profileInput struct {
 	Biodata  string    `json:"biodata"`
-	ImageURL string    `json:"image_url" binding:"url"`
+	ImageURL string    `json:"image_url"`
 	FullName string    `json:"full_name"`
 	Birthday time.Time `json:"birthday"`
 }
@@ -34,41 +34,28 @@ func CreateProfile(c *gin.Context) {
 
 	// Validate input
 	var input profileInput
-
-	// lakukan validasi image url hanya jika diisi oleh user
-	// krn image url sudah diberi nilai default di struct nya
-	if input.ImageURL != "" {
-		if err := c.ShouldBindJSON(&input); err != nil {
-			errorMessage := utils.CustomBindError(err)
-			if errorMessage != "" {
-				c.JSON(http.StatusBadRequest,
-					utils.ResponseJSON(errorMessage, http.StatusBadRequest, nil))
-			}
-			return
-		}
+	if err := c.ShouldBindJSON(&input); err != nil {
+		errorMessage := utils.CustomBindError(err)
+		c.JSON(http.StatusBadRequest, utils.ResponseJSON(errorMessage, http.StatusBadRequest, nil))
+		return
 	}
-	// ambil user id
+
+	// Ambil user id dari token
 	userID, err := token.ExtractTokenID(c)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError,
-			utils.ResponseJSON("Gagal mengambil id user", http.StatusInternalServerError, nil))
-		return
-	}
-	// cek data Profile sudah ada atau blm
-	var profile []models.Profile
-	if err := db.Where("user_id = ?", userID).Find(&profile).Error; err != nil {
-		c.JSON(http.StatusBadRequest,
-			utils.ResponseJSON(err.Error(), http.StatusBadRequest, nil))
+		c.JSON(http.StatusInternalServerError, utils.ResponseJSON("Gagal mengambil id user", http.StatusInternalServerError, nil))
 		return
 	}
 
-	if len(profile) > 0 {
-		c.JSON(http.StatusBadRequest,
-			utils.ResponseJSON("anda sudah membuat profile", http.StatusBadRequest, nil))
+	// Cek apakah profile sudah ada untuk user ini
+	var existingProfile models.Profile
+	if err := db.Where("user_id = ?", userID).First(&existingProfile).Error; err == nil {
+		c.JSON(http.StatusBadRequest, utils.ResponseJSON("Anda sudah membuat profile", http.StatusBadRequest, nil))
 		return
 	}
 
-	profile_data := models.Profile{
+	// Buat data profile baru
+	newProfile := models.Profile{
 		Biodata:  input.Biodata,
 		ImageURL: input.ImageURL,
 		FullName: input.FullName,
@@ -76,13 +63,14 @@ func CreateProfile(c *gin.Context) {
 		UserID:   userID,
 	}
 
-	if err := db.Create(&profile_data).Error; err != nil {
-		c.JSON(http.StatusInternalServerError,
-			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
+	// Buat data profile ke dalam database
+	if err := db.Create(&newProfile).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
 		return
 	}
 
-	c.JSON(http.StatusOK, utils.ResponseJSON(lib.MsgAdded("profile"), http.StatusOK, profile_data))
+	// Berhasil membuat profile
+	c.JSON(http.StatusOK, utils.ResponseJSON(lib.MsgAdded("profile"), http.StatusOK, newProfile))
 }
 
 // Update Profile for user godoc

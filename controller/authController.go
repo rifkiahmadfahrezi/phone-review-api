@@ -16,14 +16,14 @@ import (
 )
 
 type LoginInput struct {
-	Username string `json:"username"`
-	Email    string `json:"Email"`
+	Username string `json:"username" `
+	Email    string `json:"email" `
 	Password string `json:"password" binding:"required"`
 }
 
 type RegisterInput struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Username string `json:"username" binding:"required,min=5"`
+	Password string `json:"password" binding:"required,min=5"`
 	Email    string `json:"email" binding:"required,email"`
 }
 
@@ -75,7 +75,7 @@ func Login(c *gin.Context) {
 // @Summary Register a user.
 // @Description registering a user from public access.
 // @Tags Auth
-// @Param Body body RegisterInput true "the body to register a user"
+// @Param Body body RegisterInput true "the body to register a user, username min 5 characters"
 // @Produce json
 // @Success 200 {object} map[string]interface{}
 // @Router /auth/register [post]
@@ -189,6 +189,22 @@ func ChangePassword(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, utils.ResponseJSON("Password berhasil diperbarui", http.StatusOK, nil))
+}
+
+// Logoutgodoc
+// @Summary logout (ADMIN AND USER)
+// @Description Simple logout for (user/admin)
+// @Tags Auth
+// @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
+// @Security BearerToken
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /auth/logout [post]
+func Logout(c *gin.Context) {
+	domain := c.Request.Host
+	c.SetCookie("Authorization", "", -1, "/", domain, false, true)
+
+	c.JSON(http.StatusOK, utils.ResponseJSON("Logout berhasil", http.StatusSeeOther, nil))
 }
 
 func GetUserRoleId(c *gin.Context) (uint, error) {

@@ -197,7 +197,7 @@ func GetCommentsDataByReviewId(c *gin.Context) {
 
 // Delete Comment by id  godoc
 // @Summary Delete Comment by id .
-// @Description Delete a Comment by id, (user ID is taken from the JWT token)
+// @Description Delete a Comment by id, (user ID is taken from the JWT token so only loogged in user can delete its own coment)
 // @Tags Comments
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
 // @Security BearerToken

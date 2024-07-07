@@ -323,7 +323,7 @@ func isPhoneInputDataValid(c *gin.Context, data phoneInput) bool {
 
 // Get phones specification by phone ID godoc
 // @Summary Get specification data by Phone id. (PUBLIC)
-// @Description Get all Phones data by phone id.
+// @Description Get Phone specifiction data by phone id. if phone's specification data empty, the spec data will not be displayed
 // @Tags Phones
 // @Produce json
 // @Param id path string true "Phone id"

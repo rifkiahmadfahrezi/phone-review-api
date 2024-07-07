@@ -199,6 +199,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/admins/{id}/reviews": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "Get all Users review data by user id if user not create review yet the review will not appear",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admins"
+                ],
+                "summary": "Get reviews data by User id. (ADMIN ONLY)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "user id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.User"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/auth/change-password": {
             "put": {
                 "security": [
@@ -275,6 +319,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/logout": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "Simple logout for (user/admin)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "logout (ADMIN AND USER)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/auth/register": {
             "post": {
                 "description": "registering a user from public access.",
@@ -287,7 +366,7 @@ const docTemplate = `{
                 "summary": "Register a user.",
                 "parameters": [
                     {
-                        "description": "the body to register a user",
+                        "description": "the body to register a user, username min 5 characters",
                         "name": "Body",
                         "in": "body",
                         "required": true,
@@ -532,7 +611,7 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "Delete a Comment by id, (user ID is taken from the JWT token)",
+                "description": "Delete a Comment by id, (user ID is taken from the JWT token so only loogged in user can delete its own coment)",
                 "produces": [
                     "application/json"
                 ],
@@ -754,7 +833,7 @@ const docTemplate = `{
         },
         "/phones/{id}/reviews": {
             "get": {
-                "description": "Get all Reviews data by phone id.",
+                "description": "Get all Reviews data by phone id. if reviews data is empty, the review data will not be displayed",
                 "produces": [
                     "application/json"
                 ],
@@ -882,7 +961,7 @@ const docTemplate = `{
         },
         "/phones/{id}/specification": {
             "get": {
-                "description": "Get all Phones data by phone id.",
+                "description": "Get Phone specifiction data by phone id. if phone's specification data empty, the spec data will not be displayed",
                 "produces": [
                     "application/json"
                 ],
@@ -1724,7 +1803,7 @@ const docTemplate = `{
         },
         "/users/{id}/profile": {
             "get": {
-                "description": "Get all Users profile data by user id.this will only display account with role \"user\", if admin not create profile yet the profile will not appear",
+                "description": "Get all Users profile data by user id.this will only display account with role \"user\", if  user not create profile yet the profile will not be display",
                 "produces": [
                     "application/json"
                 ],
@@ -1732,6 +1811,38 @@ const docTemplate = `{
                     "Users"
                 ],
                 "summary": "Get profiles data by User id. (PUBLIC)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.User"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}/reviews": {
+            "get": {
+                "description": "Get all Users review data by user id if user not create review yet the review will not appear",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get reviews data by User id. (PUBLIC)",
                 "parameters": [
                     {
                         "type": "string",
@@ -1762,7 +1873,7 @@ const docTemplate = `{
                 "password"
             ],
             "properties": {
-                "Email": {
+                "email": {
                     "type": "string"
                 },
                 "password": {
@@ -1785,10 +1896,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 5
                 },
                 "username": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 5
                 }
             }
         },
@@ -2178,6 +2291,12 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/models.Profile"
+                    }
+                },
+                "reviews": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Review"
                     }
                 },
                 "updated_at": {

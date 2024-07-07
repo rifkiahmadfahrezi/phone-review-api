@@ -245,7 +245,7 @@ func UpdateUser(c *gin.Context) {
 
 // Get profiles data by User data ID godoc
 // @Summary Get profiles data by User id. (PUBLIC)
-// @Description Get all Users profile data by user id.this will only display account with role "user", if admin not create profile yet the profile will not appear
+// @Description Get all Users profile data by user id.this will only display account with role "user", if  user not create profile yet the profile will not be display
 // @Tags Users
 // @Produce json
 // @Param id path string true "user id"
@@ -258,6 +258,29 @@ func GetUserProfileByID(c *gin.Context) {
 
 	userID := c.Param("id")
 	if err := db.Preload("Profiles").Where("role_id != 2").First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound,
+			utils.ResponseJSON(lib.ErrMsgNotFound("user"), http.StatusNotFound, nil))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.ResponseJSON("", http.StatusOK, user))
+}
+
+// Get reviews data by User data ID godoc
+// @Summary Get reviews data by User id. (PUBLIC)
+// @Description Get all Users review data by user id if user not create review yet the review will not appear
+// @Tags Users
+// @Produce json
+// @Param id path string true "user id"
+// @Success 200 {object} []models.User
+// @Router /users/{id}/reviews [get]
+func GetUserReviewByID(c *gin.Context) {
+	var user models.User
+
+	db := c.MustGet("db").(*gorm.DB)
+
+	userID := c.Param("id")
+	if err := db.Preload("Reviews").Where("role_id != 2").Find(&user, userID).Error; err != nil {
 		c.JSON(http.StatusNotFound,
 			utils.ResponseJSON(lib.ErrMsgNotFound("user"), http.StatusNotFound, nil))
 		return
