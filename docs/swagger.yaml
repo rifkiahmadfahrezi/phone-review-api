@@ -73,8 +73,6 @@ definitions:
         type: string
       birthday:
         type: string
-      email:
-        type: string
       full_name:
         type: string
       image_url:
@@ -164,6 +162,8 @@ definitions:
     type: object
   models.Phone:
     properties:
+      brand_id:
+        type: integer
       created_at:
         type: string
       id:
@@ -194,8 +194,6 @@ definitions:
       birthday:
         type: string
       created_at:
-        type: string
-      email:
         type: string
       full_name:
         type: string
@@ -319,7 +317,7 @@ paths:
             type: object
       security:
       - BearerToken: []
-      summary: Get all account with 'admin' role.
+      summary: Get all account with 'admin' role. (admin only)
       tags:
       - Admins
   /admins/{id}:
@@ -349,13 +347,13 @@ paths:
             type: object
       security:
       - BearerToken: []
-      summary: Get single admin by ID.
+      summary: Get single admin by ID. (admin only)
       tags:
       - Admins
   /admins/{id}/profile:
     get:
       description: Get all Admins profile data by admin id. only admin can access
-        this route
+        this route, if admin not create profile yet the profile will not appear
       parameters:
       - description: 'Authorization : ''Bearer <insert_your_token_here>'''
         in: header
@@ -378,7 +376,7 @@ paths:
             type: array
       security:
       - BearerToken: []
-      summary: Get profiles data by Admin id.
+      summary: Get profiles data by Admin id. (admin only)
       tags:
       - Admins
   /admins/register:
@@ -407,7 +405,7 @@ paths:
             type: object
       security:
       - BearerToken: []
-      summary: Register a new account as admin role.
+      summary: Register a new account as admin role. (admin only)
       tags:
       - Admins
   /auth/change-password:
@@ -436,7 +434,7 @@ paths:
             type: object
       security:
       - BearerToken: []
-      summary: Change password
+      summary: Change password (ADMIN AND USER)
       tags:
       - Auth
   /auth/login:
@@ -493,7 +491,7 @@ paths:
             items:
               $ref: '#/definitions/models.Brand'
             type: array
-      summary: Get all Phones brands.
+      summary: Get all Phones brands. (PUBLIC)
       tags:
       - Brands
     post:
@@ -520,7 +518,7 @@ paths:
             $ref: '#/definitions/models.Brand'
       security:
       - BearerToken: []
-      summary: Create New Brand
+      summary: Create New Brand (ADMIN ONLY)
       tags:
       - Brands
   /brands/{id}:
@@ -548,7 +546,7 @@ paths:
             type: object
       security:
       - BearerToken: []
-      summary: Delete Brand by id .
+      summary: Delete Brand by id . (ADMIN ONLY)
       tags:
       - Brands
     get:
@@ -568,7 +566,7 @@ paths:
             items:
               $ref: '#/definitions/models.Brand'
             type: array
-      summary: Get single brand data by ID.
+      summary: Get single brand data by ID. (PUBLIC)
       tags:
       - Brands
     put:
@@ -600,7 +598,7 @@ paths:
             $ref: '#/definitions/models.Brand'
       security:
       - BearerToken: []
-      summary: Update Brand data.
+      summary: Update Brand data. (ADMIN ONLY)
       tags:
       - Brands
   /brands/{id}/phones:
@@ -621,7 +619,7 @@ paths:
             items:
               $ref: '#/definitions/models.Brand'
             type: array
-      summary: Get phones data by Brand id.
+      summary: Get phones data by Brand id. (PUBLIC)
       tags:
       - Brands
   /comments/{id}:
@@ -664,7 +662,7 @@ paths:
             items:
               $ref: '#/definitions/models.Phone'
             type: array
-      summary: Get all Phones data.
+      summary: Get all Phones data. (PUBLIC)
       tags:
       - Phones
     post:
@@ -676,7 +674,8 @@ paths:
         name: Authorization
         required: true
         type: string
-      - description: example JSON body to create a new Phone
+      - description: example JSON body to create a new Phone, sample release_data
+          format = 2023-09-22T00:00:00Z
         in: body
         name: Body
         required: true
@@ -691,7 +690,7 @@ paths:
             $ref: '#/definitions/models.Phone'
       security:
       - BearerToken: []
-      summary: Create New Phone
+      summary: Create New Phone (ADMIN ONLY)
       tags:
       - Phones
   /phones/{id}:
@@ -720,7 +719,7 @@ paths:
             type: object
       security:
       - BearerToken: []
-      summary: Delete Phone by id .
+      summary: Delete Phone by id . (ADMIN ONLY)
       tags:
       - Phones
     get:
@@ -738,7 +737,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Phone'
-      summary: Get Phone.
+      summary: Get Phone. (PUBLIC)
       tags:
       - Phones
     put:
@@ -755,7 +754,8 @@ paths:
         name: id
         required: true
         type: string
-      - description: tExample JSON body to update Phone data
+      - description: Example JSON body to update Phone data, sample release_data format
+          = 2023-09-22T00:00:00Z
         in: body
         name: Body
         required: true
@@ -770,7 +770,7 @@ paths:
             $ref: '#/definitions/models.Phone'
       security:
       - BearerToken: []
-      summary: Update Phone data.
+      summary: Update Phone data. (ADMIN ONLY)
       tags:
       - Phones
   /phones/{id}/reviews:
@@ -791,12 +791,12 @@ paths:
             items:
               $ref: '#/definitions/models.Phone'
             type: array
-      summary: Get reviews data by Phone id.
+      summary: Get reviews data by Phone id. (PUBLIC)
       tags:
       - Phones
     post:
       description: This route will create review data , user ID is taken from the
-        JWT token
+        JWT token, one user only can give one review to one phone
       parameters:
       - description: 'Authorization : ''Bearer <insert_your_token_here>'''
         in: header
@@ -876,7 +876,7 @@ paths:
             items:
               $ref: '#/definitions/models.Phone'
             type: array
-      summary: Get specification data by Phone id.
+      summary: Get specification data by Phone id. (PUBLIC)
       tags:
       - Phones
     post:
@@ -908,7 +908,7 @@ paths:
             $ref: '#/definitions/models.Specification'
       security:
       - BearerToken: []
-      summary: Create Specification for phone
+      summary: Create Specification for phone (ADMIN ONLY)
       tags:
       - Phones
     put:
@@ -940,13 +940,13 @@ paths:
             $ref: '#/definitions/models.Specification'
       security:
       - BearerToken: []
-      summary: Update Specification for phone
+      summary: Update Specification for phone (ADMIN ONLY)
       tags:
       - Phones
   /profiles:
     post:
-      description: Creating a profile data for user, only registered user can access
-        this route
+      description: Creating a profile data for user, user ID is taken from JWT Token
+        so only acount's owner can create the profile
       parameters:
       - description: 'Authorization : ''Bearer <insert_your_token_here>'''
         in: header
@@ -973,8 +973,8 @@ paths:
       tags:
       - Profiles
     put:
-      description: Updating a profile data for user, only registered user can access
-        this route
+      description: Updating a profile data for user, user ID is taken from JWT Token
+        so only acount's owner can update the profile
       parameters:
       - description: 'Authorization : ''Bearer <insert_your_token_here>'''
         in: header
@@ -1052,7 +1052,8 @@ paths:
       tags:
       - Reviews
     post:
-      description: Creating a comment data, (user ID is taken from the JWT token)
+      description: Creating a comment on a phone review, (user ID is taken from the
+        JWT token)
       parameters:
       - description: 'Authorization : ''Bearer <insert_your_token_here>'''
         in: header
@@ -1080,7 +1081,7 @@ paths:
             $ref: '#/definitions/models.Comment'
       security:
       - BearerToken: []
-      summary: Create Comment
+      summary: Create Comment on a review
       tags:
       - Reviews
   /reviews/{id}/comments/{com_id}:
@@ -1119,7 +1120,7 @@ paths:
             $ref: '#/definitions/models.Comment'
       security:
       - BearerToken: []
-      summary: Update Comment
+      summary: Update Comment on a review
       tags:
       - Reviews
   /roles:
@@ -1142,7 +1143,7 @@ paths:
             type: array
       security:
       - BearerToken: []
-      summary: Get all  roles.
+      summary: Get all  roles. (ADMIN ONLY)
       tags:
       - Roles
     post:
@@ -1168,7 +1169,7 @@ paths:
             $ref: '#/definitions/models.Role'
       security:
       - BearerToken: []
-      summary: Create New Role
+      summary: Create New Role (ADMIN ONLY)
       tags:
       - Roles
   /roles/{id}:
@@ -1196,7 +1197,7 @@ paths:
             type: object
       security:
       - BearerToken: []
-      summary: Delete Role by id .
+      summary: Delete Role by id . (ADMIN ONLY)
       tags:
       - Roles
     get:
@@ -1223,7 +1224,7 @@ paths:
             type: array
       security:
       - BearerToken: []
-      summary: Get role by ID.
+      summary: Get role by ID. (ADMIN ONLY)
       tags:
       - Roles
     put:
@@ -1255,12 +1256,13 @@ paths:
             $ref: '#/definitions/models.Role'
       security:
       - BearerToken: []
-      summary: Update Role data.
+      summary: Update Role data. (ADMIN ONLY)
       tags:
       - Roles
   /roles/{id}/users:
     get:
-      description: Get all Users data by role id. only admin can access this route
+      description: Get all Users data by role id. only admin can access this route,
+        if role has'nt have any user it will not display the user data
       parameters:
       - description: 'Authorization : ''Bearer <insert_your_token_here>'''
         in: header
@@ -1283,12 +1285,13 @@ paths:
             type: array
       security:
       - BearerToken: []
-      summary: Get users data by Role id.
+      summary: Get users data by Role id. (ADMIN ONLY)
       tags:
       - Roles
   /users:
     delete:
-      description: Will delete the user account itself
+      description: Will delete the user account itself, user ID is taken from JWT
+        Token so only acount's owner can delete its own accout
       parameters:
       - description: 'Authorization : ''Bearer <insert_your_token_here>'''
         in: header
@@ -1328,12 +1331,13 @@ paths:
                 type: string
               type: array
             type: object
-      summary: Get all account with user role.
+      summary: Get all account with user role. (PUBLIC)
       tags:
       - Users
   /users/:
     put:
-      description: update its own user data
+      description: update its own user data, user ID is taken from JWT Token so only
+        acount's owner can update the user information
       parameters:
       - description: 'Authorization : ''Bearer <insert_your_token_here>'''
         in: header
@@ -1385,7 +1389,7 @@ paths:
             type: object
       security:
       - BearerToken: []
-      summary: Delete User by id .
+      summary: Delete User by id (ADMIN ONLY)
       tags:
       - Users
     get:
@@ -1407,12 +1411,13 @@ paths:
                 type: string
               type: array
             type: object
-      summary: Get single user by ID.
+      summary: Get single user by ID. (PUBLIC)
       tags:
       - Users
   /users/{id}/profile:
     get:
-      description: Get all Users profile data by user id.
+      description: Get all Users profile data by user id.this will only display account
+        with role "user", if admin not create profile yet the profile will not appear
       parameters:
       - description: user id
         in: path
@@ -1428,7 +1433,7 @@ paths:
             items:
               $ref: '#/definitions/models.User'
             type: array
-      summary: Get profiles data by User id.
+      summary: Get profiles data by User id. (PUBLIC)
       tags:
       - Users
 swagger: "2.0"

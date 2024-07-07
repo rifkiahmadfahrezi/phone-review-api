@@ -119,7 +119,7 @@ type changePasswordInput struct {
 }
 
 // ChangePassword godoc
-// @Summary Change password
+// @Summary Change password (ADMIN AND USER)
 // @Description changging current logged in user's password
 // @Tags Auth
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"

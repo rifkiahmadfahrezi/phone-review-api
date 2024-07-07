@@ -26,7 +26,7 @@ type brandUpdate struct {
 }
 
 // Get all phone brands
-// @Summary Get all Phones brands.
+// @Summary Get all Phones brands. (PUBLIC)
 // @Description Get a list of Phone brands.
 // @Tags Brands
 // @Produce json
@@ -78,7 +78,7 @@ func GetAllBrandData(c *gin.Context) {
 }
 
 // Create New Brand godoc
-// @Summary Create New Brand
+// @Summary Create New Brand (ADMIN ONLY)
 // @Description Creating a new Brand data, only account with role admin can access this route
 // @Tags Brands
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
@@ -133,7 +133,7 @@ func CreateBrand(c *gin.Context) {
 }
 
 // Get phones data by Brand data ID godoc
-// @Summary Get phones data by Brand id.
+// @Summary Get phones data by Brand id. (PUBLIC)
 // @Description Get all Phones data by brand id.
 // @Tags Brands
 // @Produce json
@@ -157,7 +157,7 @@ func GetPhonesDataByBrandId(c *gin.Context) {
 }
 
 // Get  Brand data by ID godoc
-// @Summary Get single brand data by ID.
+// @Summary Get single brand data by ID. (PUBLIC)
 // @Description Get Brand data by ID.
 // @Tags Brands
 // @Produce json
@@ -171,7 +171,8 @@ func GetBrandById(c *gin.Context) {
 	brandID := c.Param("id")
 
 	if err := db.Select("id", "logo_url", "name", "description", "created_at", "updated_at").First(&brands_data, brandID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Brand not found"})
+		c.JSON(http.StatusNotFound,
+			utils.ResponseJSON(lib.ErrMsgNotFound("brand"), http.StatusNotFound, nil))
 		return
 	}
 
@@ -186,7 +187,7 @@ func GetBrandById(c *gin.Context) {
 }
 
 // Update Brand data godoc
-// @Summary Update Brand data.
+// @Summary Update Brand data. (ADMIN ONLY)
 // @Description Update Brand data by id, only account with role admin can access this route
 // @Tags Brands
 // @Produce json
@@ -252,7 +253,7 @@ func UpdateBrand(c *gin.Context) {
 }
 
 // Delete Brand by id  godoc
-// @Summary Delete Brand by id .
+// @Summary Delete Brand by id . (ADMIN ONLY)
 // @Description Delete a Brand by id
 // @Tags Brands
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"

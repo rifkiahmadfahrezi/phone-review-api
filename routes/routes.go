@@ -73,6 +73,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	// ⬇ REGISTERED ACCOUNT ONLY (user/admin)
 	// ID user diambil dari token
 	profileMiddlewareRoutes.POST("", controller.CreateProfile)
+	profileMiddlewareRoutes.PUT("", controller.UpdateProfile)
 
 	// role routes
 	roleMiddlewareRoutes := r.Group("/roles")

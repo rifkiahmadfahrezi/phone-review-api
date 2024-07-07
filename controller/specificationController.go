@@ -5,6 +5,7 @@ import (
 	"final-project/models"
 	"final-project/utils"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -32,7 +33,7 @@ type specificationUpdate struct {
 }
 
 // Create Specification for phone godoc
-// @Summary Create Specification for phone
+// @Summary Create Specification for phone (ADMIN ONLY)
 // @Description Creating a specification data for phone, only admin can access this route
 // @Tags Phones
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
@@ -57,9 +58,24 @@ func CreateSpecification(c *gin.Context) {
 		return
 	}
 
-	phoneID := c.Param("id")
+	phoneIDstr := c.Param("id")
 
-	// cek data specification ada berdasarkan phone_id
+	phoneID, err := strconv.Atoi(phoneIDstr)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError,
+			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
+		return
+	}
+
+	// validasi jika phone id tidak diisi
+	if phoneID <= 0 {
+		c.JSON(http.StatusBadRequest,
+			utils.ResponseJSON("phone_id tidak boleh kosong", http.StatusBadRequest, nil))
+		return
+	}
+
+	// cek apakah phone deng id (phoneID) sudah memiliki data specification
 	var specification []models.Specification
 	if err := db.Where("phone_id = ?", phoneID).Find(&specification).Error; err != nil {
 		c.JSON(http.StatusBadRequest,
@@ -77,7 +93,7 @@ func CreateSpecification(c *gin.Context) {
 	var phone []models.Phone
 	if err := db.Where("id = ?", phoneID).Find(&phone).Error; err != nil {
 		c.JSON(http.StatusBadRequest,
-			utils.ResponseJSON(err.Error(), http.StatusBadRequest, nil))
+			utils.ResponseJSON(lib.ErrMsgNotFound("phone"), http.StatusBadRequest, nil))
 		return
 	}
 
@@ -95,6 +111,7 @@ func CreateSpecification(c *gin.Context) {
 		Camera:            input.Camera,
 		Battery:           input.Battery,
 		AdditionalFeature: input.AdditionalFeature,
+		PhoneID:           uint(phoneID),
 	}
 
 	if err := db.Create(&specification_data).Error; err != nil {
@@ -107,7 +124,7 @@ func CreateSpecification(c *gin.Context) {
 }
 
 // Update Specification for phone godoc
-// @Summary Update Specification for phone
+// @Summary Update Specification for phone (ADMIN ONLY)
 // @Description Creating a specification data for phone, only admin can access this route
 // @Tags Phones
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
@@ -137,7 +154,7 @@ func UpdateSpecification(c *gin.Context) {
 	var spec models.Specification
 	if err := db.Where("phone_id = ?", phoneID).First(&spec).Error; err != nil {
 		c.JSON(http.StatusBadRequest,
-			utils.ResponseJSON(err.Error(), http.StatusBadRequest, nil))
+			utils.ResponseJSON(lib.ErrMsgNotFound("phone"), http.StatusBadRequest, nil))
 		return
 	}
 

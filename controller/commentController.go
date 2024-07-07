@@ -19,8 +19,8 @@ type commentInput struct {
 }
 
 // Create Comment godoc
-// @Summary Create Comment
-// @Description Creating a comment data, (user ID is taken from the JWT token)
+// @Summary Create Comment on a review
+// @Description Creating a comment on a phone review, (user ID is taken from the JWT token)
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
 // @Tags Reviews
 // @Security BearerToken
@@ -88,7 +88,7 @@ func CreateComment(c *gin.Context) {
 }
 
 // Update Comment godoc
-// @Summary Update Comment
+// @Summary Update Comment on a review
 // @Description This route will update comment data, will only be able to update data related to the logged in user (user ID is taken from the JWT token)
 // @Tags Reviews
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
@@ -181,6 +181,12 @@ func GetCommentsDataByReviewId(c *gin.Context) {
 
 	id := c.Param("id")
 	if err := db.Preload("Comments").Find(&reviews, id).Error; err != nil {
+		c.JSON(http.StatusInternalServerError,
+			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
+		return
+	}
+
+	if len(reviews) == 0 {
 		c.JSON(http.StatusNotFound,
 			utils.ResponseJSON(lib.ErrMsgNotFound("review"), http.StatusNotFound, nil))
 		return
@@ -202,8 +208,17 @@ func GetCommentsDataByReviewId(c *gin.Context) {
 func DeleteCommentByID(c *gin.Context) {
 
 	db := c.MustGet("db").(*gorm.DB)
+
+	userID, err := token.ExtractTokenID(c)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError,
+			utils.ResponseJSON("gagal medapatkan user id", http.StatusInternalServerError, nil))
+		return
+	}
+
 	var comment_data models.Comment
-	if err := db.Where("id = ?", c.Param("id")).First(&comment_data).Error; err != nil {
+	if err := db.Where("id = ? AND user_id = ? ", c.Param("id"), userID).First(&comment_data).Error; err != nil {
 		c.JSON(http.StatusBadRequest,
 			utils.ResponseJSON(lib.ErrMsgNotFound("comment"), http.StatusBadRequest, nil))
 		return

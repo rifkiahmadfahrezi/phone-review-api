@@ -32,7 +32,15 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 
 func RoleMiddleware(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// validasi token
+		if err := token.TokenValid(c); err != nil {
+			c.JSON(http.StatusBadRequest,
+				utils.ResponseJSON("Token tidak valid", http.StatusBadRequest, nil))
+			return
+		}
+
 		userID, err := token.ExtractTokenID(c)
+
 		if err != nil {
 			c.JSON(http.StatusBadRequest,
 				utils.ResponseJSON(err.Error(), http.StatusBadRequest, nil))

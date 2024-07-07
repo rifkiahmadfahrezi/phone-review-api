@@ -39,11 +39,12 @@ type PhonesCompleteResponse struct {
 	FullName    string    `json:"full_name"`
 	Price       float64   `json:"price"`
 	ReleaseDate time.Time `json:"release_date"`
+	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 // Get all phone data
-// @Summary Get all Phones data.
+// @Summary Get all Phones data. (PUBLIC)
 // @Description Get a list of Phone.
 // @Tags Phones
 // @Produce json
@@ -79,7 +80,7 @@ func GetAllPhoneData(c *gin.Context) {
 				  phones.image_url as phone_image, 
 				  phones.model as phone_model, 
 				  brands.name || ' ' || phones.model as full_name, 
-				  phones.price, phones.release_date, phones.updated_at`).
+				  phones.price, phones.release_date, phones.created_at, phones.updated_at`).
 		Joins("join brands on brands.id = phones.brand_id").
 		Scan(&phones_data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError,
@@ -101,12 +102,12 @@ func GetAllPhoneData(c *gin.Context) {
 }
 
 // Create New Phone godoc
-// @Summary Create New Phone
+// @Summary Create New Phone (ADMIN ONLY)
 // @Description Creating a new Phone data, only account with role admin can accsess this route
 // @Tags Phones
 // @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
 // @Security BearerToken
-// @Param Body body phoneInput true "example JSON body to create a new Phone"
+// @Param Body body phoneInput true "example JSON body to create a new Phone, sample release_data format = 2023-09-22T00:00:00Z"
 // @Produce json
 // @Success 200 {object} models.Phone
 // @Router /phones [post]
@@ -159,7 +160,7 @@ func CreatePhoneData(c *gin.Context) {
 }
 
 // GetPhoneById godoc
-// @Summary Get Phone.
+// @Summary Get Phone. (PUBLIC)
 // @Description Get a Phone by id.
 // @Tags Phones
 // @Produce json
@@ -177,7 +178,7 @@ func GetPhoneById(c *gin.Context) {
 				  phones.image_url as phone_image, 
 				  phones.model as phone_model, 
 				  brands.name || ' ' || phones.model as full_name, 
-				  phones.price, phones.release_date, phones.updated_at`).
+				  phones.price, phones.release_date, phones.created_at, phones.updated_at`).
 		Joins("join brands on brands.id = phones.brand_id").
 		Where("phones.id = ? ", c.Param("id")).
 		Scan(&phone).Error; err != nil {
@@ -197,14 +198,14 @@ func GetPhoneById(c *gin.Context) {
 }
 
 // Update Phone data godoc
-// @Summary Update Phone data.
+// @Summary Update Phone data. (ADMIN ONLY)
 // @Description Update Phone data by id, only account with role admin can access this route
 // @Tags Phones
 // @Produce json
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
 // @Security BearerToken
 // @Param id path string true "Phone id"
-// @Param Body body phoneInput true "tExample JSON body to update Phone data"
+// @Param Body body phoneInput true "Example JSON body to update Phone data, sample release_data format = 2023-09-22T00:00:00Z"
 // @Success 200 {object} models.Phone
 // @Router /phones/{id} [put]
 func UpdatePhoneData(c *gin.Context) {
@@ -230,13 +231,15 @@ func UpdatePhoneData(c *gin.Context) {
 		return
 	}
 
-	// cek apakah brand id dari input ada di tabel brand
+	// jika brand id diganti maka cek apakah brand id dari input ada di tabel brand
 	var brand models.Brand
-	if err := db.Where("id = ?", input.BrandID).First(&brand).Error; err != nil {
-		idStr := strconv.Itoa(int(input.BrandID))
-		c.JSON(http.StatusNotFound,
-			utils.ResponseJSON(lib.ErrMsgNotFound("brand dengan id "+idStr), http.StatusNotFound, nil))
-		return
+	if input.BrandID != 0 {
+		if err := db.Where("id = ?", input.BrandID).First(&brand).Error; err != nil {
+			idStr := strconv.Itoa(int(input.BrandID))
+			c.JSON(http.StatusNotFound,
+				utils.ResponseJSON(lib.ErrMsgNotFound("brand dengan id "+idStr), http.StatusNotFound, nil))
+			return
+		}
 	}
 
 	if input.ImageURL != "" && !utils.IsValidUrl(input.ImageURL) {
@@ -250,6 +253,10 @@ func UpdatePhoneData(c *gin.Context) {
 	updated_data.ImageURL = input.ImageURL
 	updated_data.ReleaseDate = input.ReleaseDate
 	updated_data.Price = input.Price
+	if input.BrandID != 0 {
+		updated_data.BrandID = input.BrandID
+	}
+	updated_data.BrandID = brand.ID
 	updated_data.UpdatedAt = time.Now()
 
 	// update ke tabel
@@ -259,7 +266,7 @@ func UpdatePhoneData(c *gin.Context) {
 }
 
 // Delete Phone by id  godoc
-// @Summary Delete Phone by id .
+// @Summary Delete Phone by id . (ADMIN ONLY)
 // @Description Delete a Phone by id, only account with role admin can access this route
 // @Tags Phones
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
@@ -315,7 +322,7 @@ func isPhoneInputDataValid(c *gin.Context, data phoneInput) bool {
 }
 
 // Get phones specification by phone ID godoc
-// @Summary Get specification data by Phone id.
+// @Summary Get specification data by Phone id. (PUBLIC)
 // @Description Get all Phones data by phone id.
 // @Tags Phones
 // @Produce json

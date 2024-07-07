@@ -19,11 +19,11 @@ type deleteUserInput struct {
 
 type userUpdate struct {
 	Username string `json:"username"`
-	Email    string `json:"email"`
+	Email    string `json:"email" binding:"email"`
 }
 
 // Get all users
-// @Summary Get all account with user role.
+// @Summary Get all account with user role. (PUBLIC)
 // @Description Get a list of account with 'user' role.
 // @Tags Users
 // @Produce json
@@ -75,7 +75,7 @@ func GetAllUser(c *gin.Context) {
 }
 
 // Get User by ID godoc
-// @Summary Get single user by ID.
+// @Summary Get single user by ID. (PUBLIC)
 // @Description Get user data by ID.
 // @Tags Users
 // @Produce json
@@ -98,7 +98,7 @@ func GetUserByID(c *gin.Context) {
 
 // Delete account
 // @Summary Delete user's own account
-// @Description Will delete the user account itself
+// @Description Will delete the user account itself, user ID is taken from JWT Token so only acount's owner can delete its own accout
 // @Tags Users
 // @Produce json
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
@@ -149,7 +149,7 @@ func DeleteMyAccount(c *gin.Context) {
 }
 
 // Delete User by id  godoc
-// @Summary Delete User by id .
+// @Summary Delete User by id (ADMIN ONLY)
 // @Description Delete a User by id, only admin can access this route
 // @Tags Users
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
@@ -172,14 +172,18 @@ func DeleteUserById(c *gin.Context) {
 		return
 	}
 
-	db.Delete(&user)
+	if err := db.Delete(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError,
+			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
+		return
+	}
 	c.JSON(http.StatusOK,
 		utils.ResponseJSON(lib.MsgDeleted("user"), http.StatusOK, user))
 }
 
 // Update User data godoc
 // @Summary Update User data.
-// @Description update its own user data
+// @Description update its own user data, user ID is taken from JWT Token so only acount's owner can update the user information
 // @Tags Users
 // @Produce json
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
@@ -240,8 +244,8 @@ func UpdateUser(c *gin.Context) {
 }
 
 // Get profiles data by User data ID godoc
-// @Summary Get profiles data by User id.
-// @Description Get all Users profile data by user id.
+// @Summary Get profiles data by User id. (PUBLIC)
+// @Description Get all Users profile data by user id.this will only display account with role "user", if admin not create profile yet the profile will not appear
 // @Tags Users
 // @Produce json
 // @Param id path string true "user id"

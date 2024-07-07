@@ -13,7 +13,7 @@ import (
 )
 
 // Register Admin godoc
-// @Summary Register a new account as admin role.
+// @Summary Register a new account as admin role. (admin only)
 // @Description registering a new account with admin role, only account with role admin can access this route
 // @Tags Admins
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
@@ -68,7 +68,7 @@ func RegisterAdmin(c *gin.Context) {
 // admin role
 
 // Get all admins
-// @Summary Get all account with 'admin' role.
+// @Summary Get all account with 'admin' role. (admin only)
 // @Description Get a list of account with 'admin' role, only role admin can acces this route
 // @Tags Admins
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
@@ -122,7 +122,7 @@ func GetAllAdmins(c *gin.Context) {
 }
 
 // Get Admin by ID godoc
-// @Summary Get single admin by ID.
+// @Summary Get single admin by ID. (admin only)
 // @Description Get admin data by ID. only role admin can acces to this route
 // @Tags Admins
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
@@ -146,8 +146,8 @@ func GetAdminByID(c *gin.Context) {
 }
 
 // Get profiles data by Admin data ID godoc
-// @Summary Get profiles data by Admin id.
-// @Description Get all Admins profile data by admin id. only admin can access this route
+// @Summary Get profiles data by Admin id. (admin only)
+// @Description Get all Admins profile data by admin id. only admin can access this route, if admin not create profile yet the profile will not appear
 // @Tags Admins
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
 // @Security BearerToken

@@ -18,7 +18,7 @@ type roleInput struct {
 }
 
 // Get all roles
-// @Summary Get all  roles.
+// @Summary Get all  roles. (ADMIN ONLY)
 // @Description Get a list of user's roles. only admin can access this route
 // @Tags Roles
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
@@ -72,7 +72,7 @@ func GetAllRoleData(c *gin.Context) {
 }
 
 // Get role by ID
-// @Summary Get role by ID.
+// @Summary Get role by ID. (ADMIN ONLY)
 // @Description Get a role data by id. only admin can access this route
 // @Tags Roles
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
@@ -90,6 +90,12 @@ func GetRoleDataByID(c *gin.Context) {
 
 	err := db.Select("id", "name", "created_at", "updated_at").Where("id = ?", id).Find(&roles_data).Error
 	if err != nil {
+		c.JSON(http.StatusBadRequest,
+			utils.ResponseJSON(err.Error(), http.StatusBadRequest, nil))
+		return
+	}
+
+	if len(roles_data) == 0 {
 		c.JSON(http.StatusNotFound,
 			utils.ResponseJSON(lib.ErrMsgNotFound("role"), http.StatusNotFound, nil))
 		return
@@ -100,7 +106,7 @@ func GetRoleDataByID(c *gin.Context) {
 }
 
 // Create New Role godoc
-// @Summary Create New Role
+// @Summary Create New Role (ADMIN ONLY)
 // @Description Creating a new Role data, only admin can access this route
 // @Tags Roles
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
@@ -148,7 +154,7 @@ func CreateRole(c *gin.Context) {
 }
 
 // Delete Role by id  godoc
-// @Summary Delete Role by id .
+// @Summary Delete Role by id . (ADMIN ONLY)
 // @Description Delete a Role by id, only admin can access this route
 // @Tags Roles
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
@@ -192,7 +198,7 @@ func DeleteRoleByID(c *gin.Context) {
 }
 
 // Update Role data godoc
-// @Summary Update Role data.
+// @Summary Update Role data. (ADMIN ONLY)
 // @Description Update Role data by id, only account with role admin can access this route
 // @Tags Roles
 // @Produce json
@@ -257,8 +263,8 @@ func UpdateRole(c *gin.Context) {
 }
 
 // Get users data by Role data ID godoc
-// @Summary Get users data by Role id.
-// @Description Get all Users data by role id. only admin can access this route
+// @Summary Get users data by Role id. (ADMIN ONLY)
+// @Description Get all Users data by role id. only admin can access this route, if role has'nt have any user it will not display the user data
 // @Tags Roles
 // @Produce json
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"

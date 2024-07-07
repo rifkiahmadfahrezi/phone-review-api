@@ -38,7 +38,7 @@ const docTemplate = `{
                 "tags": [
                     "Admins"
                 ],
-                "summary": "Get all account with 'admin' role.",
+                "summary": "Get all account with 'admin' role. (admin only)",
                 "parameters": [
                     {
                         "type": "string",
@@ -78,7 +78,7 @@ const docTemplate = `{
                 "tags": [
                     "Admins"
                 ],
-                "summary": "Register a new account as admin role.",
+                "summary": "Register a new account as admin role. (admin only)",
                 "parameters": [
                     {
                         "type": "string",
@@ -122,7 +122,7 @@ const docTemplate = `{
                 "tags": [
                     "Admins"
                 ],
-                "summary": "Get single admin by ID.",
+                "summary": "Get single admin by ID. (admin only)",
                 "parameters": [
                     {
                         "type": "string",
@@ -162,14 +162,14 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "Get all Admins profile data by admin id. only admin can access this route",
+                "description": "Get all Admins profile data by admin id. only admin can access this route, if admin not create profile yet the profile will not appear",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Admins"
                 ],
-                "summary": "Get profiles data by Admin id.",
+                "summary": "Get profiles data by Admin id. (admin only)",
                 "parameters": [
                     {
                         "type": "string",
@@ -213,7 +213,7 @@ const docTemplate = `{
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Change password",
+                "summary": "Change password (ADMIN AND USER)",
                 "parameters": [
                     {
                         "type": "string",
@@ -316,7 +316,7 @@ const docTemplate = `{
                 "tags": [
                     "Brands"
                 ],
-                "summary": "Get all Phones brands.",
+                "summary": "Get all Phones brands. (PUBLIC)",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -342,7 +342,7 @@ const docTemplate = `{
                 "tags": [
                     "Brands"
                 ],
-                "summary": "Create New Brand",
+                "summary": "Create New Brand (ADMIN ONLY)",
                 "parameters": [
                     {
                         "type": "string",
@@ -380,7 +380,7 @@ const docTemplate = `{
                 "tags": [
                     "Brands"
                 ],
-                "summary": "Get single brand data by ID.",
+                "summary": "Get single brand data by ID. (PUBLIC)",
                 "parameters": [
                     {
                         "type": "string",
@@ -415,7 +415,7 @@ const docTemplate = `{
                 "tags": [
                     "Brands"
                 ],
-                "summary": "Update Brand data.",
+                "summary": "Update Brand data. (ADMIN ONLY)",
                 "parameters": [
                     {
                         "type": "string",
@@ -463,7 +463,7 @@ const docTemplate = `{
                 "tags": [
                     "Brands"
                 ],
-                "summary": "Delete Brand by id .",
+                "summary": "Delete Brand by id . (ADMIN ONLY)",
                 "parameters": [
                     {
                         "type": "string",
@@ -502,7 +502,7 @@ const docTemplate = `{
                 "tags": [
                     "Brands"
                 ],
-                "summary": "Get phones data by Brand id.",
+                "summary": "Get phones data by Brand id. (PUBLIC)",
                 "parameters": [
                     {
                         "type": "string",
@@ -578,7 +578,7 @@ const docTemplate = `{
                 "tags": [
                     "Phones"
                 ],
-                "summary": "Get all Phones data.",
+                "summary": "Get all Phones data. (PUBLIC)",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -604,7 +604,7 @@ const docTemplate = `{
                 "tags": [
                     "Phones"
                 ],
-                "summary": "Create New Phone",
+                "summary": "Create New Phone (ADMIN ONLY)",
                 "parameters": [
                     {
                         "type": "string",
@@ -614,7 +614,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "example JSON body to create a new Phone",
+                        "description": "example JSON body to create a new Phone, sample release_data format = 2023-09-22T00:00:00Z",
                         "name": "Body",
                         "in": "body",
                         "required": true,
@@ -642,7 +642,7 @@ const docTemplate = `{
                 "tags": [
                     "Phones"
                 ],
-                "summary": "Get Phone.",
+                "summary": "Get Phone. (PUBLIC)",
                 "parameters": [
                     {
                         "type": "string",
@@ -674,7 +674,7 @@ const docTemplate = `{
                 "tags": [
                     "Phones"
                 ],
-                "summary": "Update Phone data.",
+                "summary": "Update Phone data. (ADMIN ONLY)",
                 "parameters": [
                     {
                         "type": "string",
@@ -691,7 +691,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "tExample JSON body to update Phone data",
+                        "description": "Example JSON body to update Phone data, sample release_data format = 2023-09-22T00:00:00Z",
                         "name": "Body",
                         "in": "body",
                         "required": true,
@@ -722,7 +722,7 @@ const docTemplate = `{
                 "tags": [
                     "Phones"
                 ],
-                "summary": "Delete Phone by id .",
+                "summary": "Delete Phone by id . (ADMIN ONLY)",
                 "parameters": [
                     {
                         "type": "string",
@@ -761,7 +761,7 @@ const docTemplate = `{
                 "tags": [
                     "Phones"
                 ],
-                "summary": "Get reviews data by Phone id.",
+                "summary": "Get reviews data by Phone id. (PUBLIC)",
                 "parameters": [
                     {
                         "type": "string",
@@ -837,7 +837,7 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "This route will create review data , user ID is taken from the JWT token",
+                "description": "This route will create review data , user ID is taken from the JWT token, one user only can give one review to one phone",
                 "produces": [
                     "application/json"
                 ],
@@ -889,7 +889,7 @@ const docTemplate = `{
                 "tags": [
                     "Phones"
                 ],
-                "summary": "Get specification data by Phone id.",
+                "summary": "Get specification data by Phone id. (PUBLIC)",
                 "parameters": [
                     {
                         "type": "string",
@@ -924,7 +924,7 @@ const docTemplate = `{
                 "tags": [
                     "Phones"
                 ],
-                "summary": "Update Specification for phone",
+                "summary": "Update Specification for phone (ADMIN ONLY)",
                 "parameters": [
                     {
                         "type": "string",
@@ -972,7 +972,7 @@ const docTemplate = `{
                 "tags": [
                     "Phones"
                 ],
-                "summary": "Create Specification for phone",
+                "summary": "Create Specification for phone (ADMIN ONLY)",
                 "parameters": [
                     {
                         "type": "string",
@@ -1015,7 +1015,7 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "Updating a profile data for user, only registered user can access this route",
+                "description": "Updating a profile data for user, user ID is taken from JWT Token so only acount's owner can update the profile",
                 "produces": [
                     "application/json"
                 ],
@@ -1056,7 +1056,7 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "Creating a profile data for user, only registered user can access this route",
+                "description": "Creating a profile data for user, user ID is taken from JWT Token so only acount's owner can create the profile",
                 "produces": [
                     "application/json"
                 ],
@@ -1173,14 +1173,14 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "Creating a comment data, (user ID is taken from the JWT token)",
+                "description": "Creating a comment on a phone review, (user ID is taken from the JWT token)",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Reviews"
                 ],
-                "summary": "Create Comment",
+                "summary": "Create Comment on a review",
                 "parameters": [
                     {
                         "type": "string",
@@ -1230,7 +1230,7 @@ const docTemplate = `{
                 "tags": [
                     "Reviews"
                 ],
-                "summary": "Update Comment",
+                "summary": "Update Comment on a review",
                 "parameters": [
                     {
                         "type": "string",
@@ -1287,7 +1287,7 @@ const docTemplate = `{
                 "tags": [
                     "Roles"
                 ],
-                "summary": "Get all  roles.",
+                "summary": "Get all  roles. (ADMIN ONLY)",
                 "parameters": [
                     {
                         "type": "string",
@@ -1322,7 +1322,7 @@ const docTemplate = `{
                 "tags": [
                     "Roles"
                 ],
-                "summary": "Create New Role",
+                "summary": "Create New Role (ADMIN ONLY)",
                 "parameters": [
                     {
                         "type": "string",
@@ -1365,7 +1365,7 @@ const docTemplate = `{
                 "tags": [
                     "Roles"
                 ],
-                "summary": "Get role by ID.",
+                "summary": "Get role by ID. (ADMIN ONLY)",
                 "parameters": [
                     {
                         "type": "string",
@@ -1407,7 +1407,7 @@ const docTemplate = `{
                 "tags": [
                     "Roles"
                 ],
-                "summary": "Update Role data.",
+                "summary": "Update Role data. (ADMIN ONLY)",
                 "parameters": [
                     {
                         "type": "string",
@@ -1455,7 +1455,7 @@ const docTemplate = `{
                 "tags": [
                     "Roles"
                 ],
-                "summary": "Delete Role by id .",
+                "summary": "Delete Role by id . (ADMIN ONLY)",
                 "parameters": [
                     {
                         "type": "string",
@@ -1492,14 +1492,14 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "Get all Users data by role id. only admin can access this route",
+                "description": "Get all Users data by role id. only admin can access this route, if role has'nt have any user it will not display the user data",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Roles"
                 ],
-                "summary": "Get users data by Role id.",
+                "summary": "Get users data by Role id. (ADMIN ONLY)",
                 "parameters": [
                     {
                         "type": "string",
@@ -1538,7 +1538,7 @@ const docTemplate = `{
                 "tags": [
                     "Users"
                 ],
-                "summary": "Get all account with user role.",
+                "summary": "Get all account with user role. (PUBLIC)",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1560,7 +1560,7 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "Will delete the user account itself",
+                "description": "Will delete the user account itself, user ID is taken from JWT Token so only acount's owner can delete its own accout",
                 "produces": [
                     "application/json"
                 ],
@@ -1606,7 +1606,7 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "update its own user data",
+                "description": "update its own user data, user ID is taken from JWT Token so only acount's owner can update the user information",
                 "produces": [
                     "application/json"
                 ],
@@ -1651,7 +1651,7 @@ const docTemplate = `{
                 "tags": [
                     "Users"
                 ],
-                "summary": "Get single user by ID.",
+                "summary": "Get single user by ID. (PUBLIC)",
                 "parameters": [
                     {
                         "type": "string",
@@ -1689,7 +1689,7 @@ const docTemplate = `{
                 "tags": [
                     "Users"
                 ],
-                "summary": "Delete User by id .",
+                "summary": "Delete User by id (ADMIN ONLY)",
                 "parameters": [
                     {
                         "type": "string",
@@ -1724,14 +1724,14 @@ const docTemplate = `{
         },
         "/users/{id}/profile": {
             "get": {
-                "description": "Get all Users profile data by user id.",
+                "description": "Get all Users profile data by user id.this will only display account with role \"user\", if admin not create profile yet the profile will not appear",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Users"
                 ],
-                "summary": "Get profiles data by User id.",
+                "summary": "Get profiles data by User id. (PUBLIC)",
                 "parameters": [
                     {
                         "type": "string",
@@ -1869,9 +1869,6 @@ const docTemplate = `{
                 "birthday": {
                     "type": "string"
                 },
-                "email": {
-                    "type": "string"
-                },
                 "full_name": {
                     "type": "string"
                 },
@@ -2005,6 +2002,9 @@ const docTemplate = `{
         "models.Phone": {
             "type": "object",
             "properties": {
+                "brand_id": {
+                    "type": "integer"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -2050,9 +2050,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "created_at": {
-                    "type": "string"
-                },
-                "email": {
                     "type": "string"
                 },
                 "full_name": {

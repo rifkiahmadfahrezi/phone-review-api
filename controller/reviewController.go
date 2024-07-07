@@ -25,7 +25,7 @@ type reviewUpdate struct {
 
 // Create New Review godoc
 // @Summary Create New Review
-// @Description This route will create review data , user ID is taken from the JWT token
+// @Description This route will create review data , user ID is taken from the JWT token, one user only can give one review to one phone
 // @Tags Phones
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
 // @Security BearerToken
@@ -78,6 +78,21 @@ func CreateReview(c *gin.Context) {
 	if len(phone) == 0 {
 		c.JSON(http.StatusNotFound,
 			utils.ResponseJSON(lib.ErrMsgNotFound("phone"), http.StatusNotFound, nil))
+		return
+	}
+
+	// cek apakah user sudah memberikan review ke phone dengan id (phoneID) atau belm
+	var rev []models.Review
+	if err := db.Where("phone_id = ? AND user_id = ?", phoneID, userID).First(&rev).Error; err != nil {
+		c.JSON(http.StatusInternalServerError,
+			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
+		return
+	}
+
+	if len(rev) > 0 {
+		msg := fmt.Sprintf("user (%d) sudah memberikan review ke phone (%d)", userID, phoneID)
+		c.JSON(http.StatusBadRequest,
+			utils.ResponseJSON(msg, http.StatusBadRequest, nil))
 		return
 	}
 
@@ -168,7 +183,7 @@ func UpdateReview(c *gin.Context) {
 }
 
 // Get reviews data by Phone data ID godoc
-// @Summary Get reviews data by Phone id.
+// @Summary Get reviews data by Phone id. (PUBLIC)
 // @Description Get all Reviews data by phone id.
 // @Tags Phones
 // @Produce json
@@ -213,15 +228,21 @@ func DeleteReviewById(c *gin.Context) {
 			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
 		return
 	}
-	var review models.Review
+	var review []models.Review
 	// cek apakah review dengan id tsb ada
 	if err := db.Where("id = ? AND user_id = ?", reviewID, userID).Find(&review).Error; err != nil {
-		c.JSON(http.StatusBadRequest,
-			utils.ResponseJSON(err.Error(), http.StatusBadRequest, nil))
+		c.JSON(http.StatusInternalServerError,
+			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
 		return
 	}
 
-	if err := db.Where("id = ? AND user_id = ?", reviewID, userID).Delete(&review).Error; err != nil {
+	if len(review) == 0 {
+		c.JSON(http.StatusNotFound,
+			utils.ResponseJSON(lib.ErrMsgNotFound("review"), http.StatusNotFound, nil))
+		return
+	}
+
+	if err := db.Model(&models.Review{}).Where("id = ? AND user_id = ?", reviewID, userID).Delete(&review).Error; err != nil {
 		c.JSON(http.StatusBadRequest,
 			utils.ResponseJSON(err.Error(), http.StatusBadRequest, nil))
 		return
