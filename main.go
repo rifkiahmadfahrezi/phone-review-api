@@ -33,10 +33,11 @@ func main() {
 	docs.SwaggerInfo.Title = "Phone reviews API"
 	docs.SwaggerInfo.Description = "This is a phone reviews API"
 	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Host = "localhost:8080"
 	if environment == "development" {
+		docs.SwaggerInfo.Host = "localhost:8080"
 		docs.SwaggerInfo.Schemes = []string{"http", "https"}
 	} else {
+		docs.SwaggerInfo.Host = "xenophobic-blanch-superbootcamp-45cdd211.koyeb.app/"
 		docs.SwaggerInfo.Schemes = []string{"https"}
 	}
 

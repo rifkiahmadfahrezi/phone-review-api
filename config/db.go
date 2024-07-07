@@ -73,31 +73,3 @@ func ConnectDatabase() *gorm.DB {
 
 	return db
 }
-
-// func seedData(db *gorm.DB) {
-// 	// Cek apakah tabel Role kosong
-// 	var count int64
-// 	db.Model(&models.Role{}).Count(&count)
-// 	if count == 0 {
-// 		 roles := []models.Role{
-// 			  {Name: "user"},
-// 			  {Name: "admin"},
-// 		 }
-
-// 		 for _, role := range roles {
-// 			  db.Create(&role)
-// 		 }
-// 	}
-
-// 	db.Model(&models.User{}).Count(&count)
-// 	if count == 0 {
-// 		 users := []models.User{
-// 			  {Username: "admin", Email: "admin@test.com", Password: "hashed_password", RoleID: 2},
-// 			  {Username: "user", Email: "user@test.com", Password: "hashed_password", RoleID: 1},
-// 		 }
-
-// 		 for _, user := range users {
-// 			  db.Create(&user)
-// 		 }
-// 	}
-// }
