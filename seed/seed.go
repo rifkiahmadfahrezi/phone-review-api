@@ -22,7 +22,7 @@ func Load(db *gorm.DB) {
 	//insert initial user & admin
 	user_data := []models.User{
 		{
-			Username: "user",
+			Username: "user123",
 			Email:    "user@gmail.com",
 			Password: "$2a$10$ijrkqTmYqvCdEmR/CuIJ4eNH0Br6.CDxGBoJytqE7fxuVWihqeaoO", // user123
 			RoleID:   1,                                                              // user
