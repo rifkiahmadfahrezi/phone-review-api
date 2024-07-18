@@ -1519,4 +1519,27 @@ paths:
       summary: Get reviews data by User id. (PUBLIC)
       tags:
       - Users
+  /users/role:
+    get:
+      description: Get role by user id (id is taken from JWT)
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Role'
+            type: array
+      security:
+      - BearerToken: []
+      summary: Get role by User id. (ADMIN & USER)
+      tags:
+      - Users
 swagger: "2.0"

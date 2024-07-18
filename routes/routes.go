@@ -53,6 +53,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	r.GET("/users/:id/reviews", controller.GetUserReviewByID)
 	userMiddlewareRoutes.Use(middleware.JwtAuthMiddleware())
 	// ⬇ For registered account only (user/admin)
+	userMiddlewareRoutes.GET("/role", controller.GetUserRole)
 	userMiddlewareRoutes.PUT("", controller.UpdateUser)
 	userMiddlewareRoutes.DELETE("", controller.DeleteMyAccount)
 	// ⬇ For ADMIN ONLY
