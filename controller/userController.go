@@ -6,6 +6,7 @@ import (
 	"final-project/utils"
 	"final-project/utils/token"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -20,6 +21,10 @@ type deleteUserInput struct {
 type userUpdate struct {
 	Username string `json:"username"`
 	Email    string `json:"email" binding:"email"`
+}
+
+type RoleNameData struct {
+	RoleName string `json:"role_name"`
 }
 
 // Get all users
@@ -264,6 +269,41 @@ func GetUserProfileByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, utils.ResponseJSON("", http.StatusOK, user))
+}
+
+// Get role by User ID godoc
+// @Summary Get role by User id. (ADMIN & USER)
+// @Description Get role by user id (id is taken from JWT)
+// @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
+// @Security BearerToken
+// @Tags Users
+// @Produce json
+// @Success 200 {object} []models.Role
+// @Router /users/role [get]
+func GetUserRole(c *gin.Context) {
+	var roleData RoleNameData
+
+	db := c.MustGet("db").(*gorm.DB)
+
+	userID, err := token.ExtractTokenID(c)
+	if err != nil {
+		log.Fatal(err.Error())
+		return
+	}
+
+	fmt.Println(userID)
+
+	if err := db.Table("roles").
+		Select("roles.name as role_name").
+		Joins("join users on users.role_id = roles.id").
+		Where("users.id = ?", userID).
+		Pluck("roles.name", &roleData.RoleName).Error; err != nil {
+		c.JSON(http.StatusBadRequest,
+			utils.ResponseJSON(err.Error(), http.StatusBadRequest, nil))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.ResponseJSON("", http.StatusOK, roleData))
 }
 
 // Get reviews data by User data ID godoc
