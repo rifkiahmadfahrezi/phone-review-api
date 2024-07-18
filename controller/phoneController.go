@@ -37,6 +37,7 @@ type PhonesCompleteResponse struct {
 	PhoneImage  string    `json:"phone_image"`
 	PhoneModel  string    `json:"phone_model"`
 	FullName    string    `json:"full_name"`
+	AVGRating   float64   `json:"avg_rating"`
 	Price       float64   `json:"price"`
 	ReleaseDate time.Time `json:"release_date"`
 	CreatedAt   time.Time `json:"created_at"`
@@ -75,13 +76,16 @@ func GetAllPhoneData(c *gin.Context) {
 	var phones_data []PhonesCompleteResponse
 	if err := query.Table("phones").
 		Select(`brands.name as brand_name, 
-				   phones.id as phone_id,
-				   brands.id as brand_id,
-				  phones.image_url as phone_image, 
-				  phones.model as phone_model, 
-				  brands.name || ' ' || phones.model as full_name, 
-				  phones.price, phones.release_date, phones.created_at, phones.updated_at`).
+            phones.id as phone_id,
+            brands.id as brand_id,
+            phones.image_url as phone_image, 
+            phones.model as phone_model, 
+            brands.name || ' ' || phones.model as full_name, 
+            ROUND(AVG(reviews.rating), 2) as avg_rating,
+            phones.price, phones.release_date, phones.created_at, phones.updated_at`).
+		Joins("join reviews on phones.id = reviews.phone_id").
 		Joins("join brands on brands.id = phones.brand_id").
+		Group("brands.name, phones.id, brands.id, phones.image_url, phones.model, phones.price, phones.release_date, phones.created_at, phones.updated_at").
 		Scan(&phones_data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError,
 			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
@@ -173,13 +177,16 @@ func GetPhoneById(c *gin.Context) {
 
 	if err := db.Table("phones").
 		Select(`brands.name as brand_name, 
-				   phones.id as phone_id,
-				   brands.id as brand_id,
-				  phones.image_url as phone_image, 
-				  phones.model as phone_model, 
-				  brands.name || ' ' || phones.model as full_name, 
-				  phones.price, phones.release_date, phones.created_at, phones.updated_at`).
+				phones.id as phone_id,
+				brands.id as brand_id,
+				phones.image_url as phone_image, 
+				phones.model as phone_model, 
+				brands.name || ' ' || phones.model as full_name, 
+				ROUND(AVG(reviews.rating), 2) as avg_rating,
+				phones.price, phones.release_date, phones.created_at, phones.updated_at`).
+		Joins("join reviews on phones.id = reviews.phone_id").
 		Joins("join brands on brands.id = phones.brand_id").
+		Group("brands.name, phones.id, brands.id, phones.image_url, phones.model, phones.price, phones.release_date, phones.created_at, phones.updated_at").
 		Where("phones.id = ? ", c.Param("id")).
 		Scan(&phone).Error; err != nil {
 		c.JSON(http.StatusInternalServerError,
