@@ -195,7 +195,7 @@ func DeleteUserById(c *gin.Context) {
 // @Security BearerToken
 // @Param Body body userUpdate true "tExample JSON body to update User data"
 // @Success 200 {object} models.User
-// @Router /users/ [put]
+// @Router /users [put]
 func UpdateUser(c *gin.Context) {
 
 	var input userUpdate

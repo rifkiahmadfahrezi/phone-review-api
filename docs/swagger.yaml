@@ -1394,7 +1394,6 @@ paths:
       summary: Get all account with user role. (PUBLIC)
       tags:
       - Users
-  /users/:
     put:
       description: update its own user data, user ID is taken from JWT Token so only
         acount's owner can update the user information
