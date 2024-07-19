@@ -27,6 +27,12 @@ type RegisterInput struct {
 	Email    string `json:"email" binding:"required,email"`
 }
 
+type User struct {
+	ID       uint   `json:"id"`
+	Username string `json:"username" `
+	Email    string `json:"email" `
+}
+
 // LoginUser godoc
 // @Summary Login.
 // @Description Logging in to get jwt token to access admin or user api by roles.
@@ -59,9 +65,13 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	user := map[string]string{
-		"username": u.Username,
-		"email":    u.Email,
+	// get user info
+	var user User
+
+	if err := db.Select("id", "username", "email").Where("username = ? OR email = ?", u.Username, u.Email).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest,
+			utils.ResponseJSON(err.Error(), http.StatusBadRequest, nil))
+		return
 	}
 
 	c.JSON(http.StatusOK, utils.ResponseJSON("Login berhasil", http.StatusOK, map[string]any{
