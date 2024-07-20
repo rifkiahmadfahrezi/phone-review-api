@@ -124,6 +124,17 @@ func UpdateProfile(c *gin.Context) {
 		profile.FullName = input.FullName
 	}
 
+	if input.ImageURL != "" {
+
+		if !utils.IsValidUrl(input.ImageURL) {
+			c.JSON(http.StatusBadRequest,
+				utils.ResponseJSON(lib.MsgValidUrl("image_url"), http.StatusBadRequest, nil))
+			return
+		}
+
+		profile.ImageURL = input.ImageURL
+	}
+
 	profile.UpdatedAt = time.Now()
 
 	if err := db.Save(&profile).Error; err != nil {
