@@ -195,8 +195,8 @@ type ReviewsResponse struct {
 }
 
 // Get all reviews data
-// @Summary Get reviews data by Phone id. (ADMIN ONLY)
-// @Description Get all Reviews data by phone id. if reviews data is empty, the review data will not be displayed
+// @Summary Get all reviews (ADMIN ONLY)
+// @Description Get all Reviews
 // @Tags Reviews
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
 // @Security BearerToken
