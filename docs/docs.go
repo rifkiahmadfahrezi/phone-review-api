@@ -1216,14 +1216,14 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "Get all Reviews data by phone id. if reviews data is empty, the review data will not be displayed",
+                "description": "Get all Reviews",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Reviews"
                 ],
-                "summary": "Get reviews data by Phone id. (ADMIN ONLY)",
+                "summary": "Get all reviews (ADMIN ONLY)",
                 "parameters": [
                     {
                         "type": "string",

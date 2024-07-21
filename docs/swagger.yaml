@@ -1086,8 +1086,7 @@ paths:
       - Profiles
   /reviews:
     get:
-      description: Get all Reviews data by phone id. if reviews data is empty, the
-        review data will not be displayed
+      description: Get all Reviews
       parameters:
       - description: 'Authorization : ''Bearer <insert_your_token_here>'''
         in: header
@@ -1106,7 +1105,7 @@ paths:
             type: array
       security:
       - BearerToken: []
-      summary: Get reviews data by Phone id. (ADMIN ONLY)
+      summary: Get all reviews (ADMIN ONLY)
       tags:
       - Reviews
   /reviews/{id}:
