@@ -1084,6 +1084,31 @@ paths:
       summary: Update Profile for user
       tags:
       - Profiles
+  /reviews:
+    get:
+      description: Get all Reviews data by phone id. if reviews data is empty, the
+        review data will not be displayed
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - BearerToken: []
+      summary: Get reviews data by Phone id. (ADMIN ONLY)
+      tags:
+      - Reviews
   /reviews/{id}:
     delete:
       description: This route will delete review data, based on the review ID and
