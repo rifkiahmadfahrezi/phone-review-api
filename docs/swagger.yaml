@@ -708,6 +708,30 @@ paths:
       summary: Delete Comment by id .
       tags:
       - Comments
+  /dashboard/all-count-data:
+    get:
+      description: Get a number of all data
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      security:
+      - BearerToken: []
+      summary: number of all data (ADMIN ONLY)
+      tags:
+      - Dashboard
   /phones:
     get:
       description: Get a list of Phone.

@@ -12,8 +12,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 )
 
-func SetupRouter(db *gorm.DB) *gin.Engine {
-	r := gin.Default()
+func SetupRouter(db *gorm.DB, r *gin.Engine) {
 
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
@@ -136,7 +135,12 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	commentMiddlewareRoutes.Use(middleware.JwtAuthMiddleware())
 	commentMiddlewareRoutes.DELETE("/:id", controller.DeleteCommentByID)
 
+	// dashboard routes (ADMIN ONLY)
+	dashboardMiddlewareRoutes := r.Group("/dashboard")
+	dashboardMiddlewareRoutes.Use(middleware.JwtAuthMiddleware())
+	dashboardMiddlewareRoutes.Use(middleware.RoleMiddleware(db))
+	dashboardMiddlewareRoutes.GET("/all-count-data", controller.GetAllDataCount)
+
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	return r
 }

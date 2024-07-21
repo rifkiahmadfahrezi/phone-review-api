@@ -1,16 +1,5 @@
 package main
 
-import (
-	"final-project/config"
-	"final-project/docs"
-	"final-project/routes"
-	"final-project/seed"
-	"final-project/utils"
-	"log"
-
-	"github.com/joho/godotenv"
-)
-
 // @contact.name API Support
 // @contact.url http://www.swagger.io/support
 // @contact.email support@swagger.io
@@ -19,37 +8,40 @@ import (
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @termsOfService http://swagger.io/terms/
+import "final-project/api"
 
 func main() {
 
-	environment := utils.GetEnv("ENVIRONMENT", "development")
-	if environment == "development" {
-		err := godotenv.Load()
-		if err != nil {
-			log.Fatal("Error loading .env file")
-		}
-	}
+	api.App.Run()
 
-	api_host := utils.GetEnv("API_HOST", "localhost")
+	// environment := utils.GetEnv("ENVIRONMENT", "development")
+	// if environment == "development" {
+	// 	err := godotenv.Load()
+	// 	if err != nil {
+	// 		log.Fatal("Error loading .env file")
+	// 	}
+	// }
 
-	docs.SwaggerInfo.Title = "Phone reviews API"
-	docs.SwaggerInfo.Description = "Phone reviews API, Rifki ahmad fahrezi"
-	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Host = api_host
-	if environment == "development" {
-		docs.SwaggerInfo.Schemes = []string{"http", "https"}
-	} else {
-		docs.SwaggerInfo.Schemes = []string{"https"}
-	}
+	// api_host := utils.GetEnv("API_HOST", "localhost")
 
-	db := config.ConnectDatabase()
-	sqlDB, _ := db.DB()
-	defer sqlDB.Close()
+	// docs.SwaggerInfo.Title = "Phone reviews API"
+	// docs.SwaggerInfo.Description = "Phone reviews API, Rifki ahmad fahrezi"
+	// docs.SwaggerInfo.Version = "1.0"
+	// docs.SwaggerInfo.Host = api_host
+	// if environment == "development" {
+	// 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+	// } else {
+	// 	docs.SwaggerInfo.Schemes = []string{"https"}
+	// }
 
-	// load initial data role dan user
-	seed.Load(db)
+	// db := config.ConnectDatabase()
+	// sqlDB, _ := db.DB()
+	// defer sqlDB.Close()
 
-	r := routes.SetupRouter(db)
-	r.Run()
+	// // load initial data role dan user
+	// seed.Load(db)
+
+	// r := routes.SetupRouter(db)
+	// r.Run()
 
 }
