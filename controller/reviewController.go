@@ -188,6 +188,40 @@ func UpdateReview(c *gin.Context) {
 	c.JSON(http.StatusOK, utils.ResponseJSON(lib.MsgUpdated("review"), http.StatusOK, rev))
 }
 
+type ReviewsResponse struct {
+	models.Review
+	Username   string `json:"username"`
+	PhoneModel string `json:"phone_model"`
+}
+
+// Get all reviews data
+// @Summary Get reviews data by Phone id. (ADMIN ONLY)
+// @Description Get all Reviews data by phone id. if reviews data is empty, the review data will not be displayed
+// @Tags Reviews
+// @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
+// @Security BearerToken
+// @Produce json
+// @Success 200 {object} []map[string]any
+// @Router /reviews [get]
+func GetAllReviews(c *gin.Context) {
+	var data []ReviewsResponse
+
+	db := c.MustGet("db").(*gorm.DB)
+
+	if err := db.Table("reviews").
+		Select("reviews.*, users.username as username, phones.model as phone_model").
+		Joins("join users on reviews.user_id = users.id").
+		Joins("join phones on reviews.phone_id = phones.id").
+		Scan(&data).Error; err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusNotFound,
+			utils.ResponseJSON(lib.ErrMsgNotFound("phone"), http.StatusNotFound, nil))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.ResponseJSON("", http.StatusOK, data))
+}
+
 // Get reviews data by Phone data ID godoc
 // @Summary Get reviews data by Phone id. (PUBLIC)
 // @Description Get all Reviews data by phone id. if reviews data is empty, the review data will not be displayed

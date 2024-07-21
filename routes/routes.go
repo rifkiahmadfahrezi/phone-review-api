@@ -130,6 +130,8 @@ func SetupRouter(db *gorm.DB, r *gin.Engine) {
 	reviewsMiddlewareRoutes.DELETE("/:id", controller.DeleteReviewById)
 	reviewsMiddlewareRoutes.POST("/:id/comments", controller.CreateComment)
 	reviewsMiddlewareRoutes.PUT("/:id/comments/:com_id", controller.UpdateComment)
+	reviewsMiddlewareRoutes.Use(middleware.RoleMiddleware(db))
+	reviewsMiddlewareRoutes.GET("", controller.GetAllReviews)
 
 	commentMiddlewareRoutes := r.Group("/comments")
 	commentMiddlewareRoutes.Use(middleware.JwtAuthMiddleware())
