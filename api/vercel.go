@@ -4,6 +4,7 @@ import (
 	"final-project/config"
 	"final-project/docs"
 	"final-project/routes"
+	"final-project/seed"
 	"final-project/utils"
 	"log"
 	"net/http"
@@ -42,7 +43,7 @@ func init() {
 	// defer sqlDB.Close()
 
 	// load initial role & user/admin auth information
-	// seed.Load()
+	seed.Load(db)
 
 	routes.SetupRouter(db, App)
 }
