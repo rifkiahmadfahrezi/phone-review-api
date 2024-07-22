@@ -122,6 +122,13 @@ func DeleteMyAccount(c *gin.Context) {
 			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
 		return
 	}
+
+	if userID == 2 { // initial admin data tidak boleh dihapus
+		c.JSON(http.StatusForbidden,
+			utils.ResponseJSON("Akun admin ini tidak boleh dihapus", http.StatusForbidden, nil))
+		return
+	}
+
 	var user models.User
 	// cek apakah user dengan id tsb ada
 	if err := db.Where("id = ?", userID).First(&user).Error; err != nil {
