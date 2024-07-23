@@ -76,15 +76,15 @@ func GetAllPhoneData(c *gin.Context) {
 	var phones_data []PhonesCompleteResponse
 	if err := query.Table("phones").
 		Select(`brands.name as brand_name, 
-            phones.id as phone_id,
-            brands.id as brand_id,
-            phones.image_url as phone_image, 
-            phones.model as phone_model, 
-            brands.name || ' ' || phones.model as full_name, 
-            ROUND(AVG(reviews.rating), 2) as avg_rating,
-            phones.price, phones.release_date, phones.created_at, phones.updated_at`).
-		Joins("join reviews on phones.id = reviews.phone_id").
-		Joins("join brands on brands.id = phones.brand_id").
+					phones.id as phone_id,
+					brands.id as brand_id,
+					phones.image_url as phone_image, 
+					phones.model as phone_model, 
+					brands.name || ' ' || phones.model as full_name, 
+					COALESCE(ROUND(AVG(reviews.rating), 2), 0) as avg_rating,
+					phones.price, phones.release_date, phones.created_at, phones.updated_at`).
+		Joins("LEFT JOIN reviews on phones.id = reviews.phone_id").
+		Joins("JOIN brands on brands.id = phones.brand_id").
 		Group("brands.name, phones.id, brands.id, phones.image_url, phones.model, phones.price, phones.release_date, phones.created_at, phones.updated_at").
 		Scan(&phones_data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError,
@@ -92,7 +92,7 @@ func GetAllPhoneData(c *gin.Context) {
 		return
 	}
 
-	// validsi jika data tidak ditemukan
+	// validate if data not found
 	if searchKeyword != "" || sort != "" {
 		if len(phones_data) == 0 {
 			emptydata := make([]string, 0)
@@ -182,12 +182,12 @@ func GetPhoneById(c *gin.Context) {
 				phones.image_url as phone_image, 
 				phones.model as phone_model, 
 				brands.name || ' ' || phones.model as full_name, 
-				ROUND(AVG(reviews.rating), 2) as avg_rating,
+				COALESCE(ROUND(AVG(reviews.rating), 2), 0) as avg_rating,
 				phones.price, phones.release_date, phones.created_at, phones.updated_at`).
-		Joins("join reviews on phones.id = reviews.phone_id").
-		Joins("join brands on brands.id = phones.brand_id").
+		Joins("LEFT JOIN reviews on phones.id = reviews.phone_id").
+		Joins("JOIN brands on brands.id = phones.brand_id").
 		Group("brands.name, phones.id, brands.id, phones.image_url, phones.model, phones.price, phones.release_date, phones.created_at, phones.updated_at").
-		Where("phones.id = ? ", c.Param("id")).
+		Where("phones.id = ?", c.Param("id")).
 		Scan(&phone).Error; err != nil {
 		c.JSON(http.StatusInternalServerError,
 			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
