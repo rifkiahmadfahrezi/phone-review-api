@@ -106,9 +106,9 @@ func CreateSpecification(c *gin.Context) {
 	specification_data := models.Specification{
 		Network:           input.Network,
 		OperatingSystem:   input.OperatingSystem,
-		Storage:           input.Storage,
-		Memory:            input.Memory,
-		Camera:            input.Camera,
+		Storage:           uint(input.Storage),
+		Memory:            uint(input.Memory),
+		Camera:            uint(input.Camera),
 		Battery:           input.Battery,
 		AdditionalFeature: input.AdditionalFeature,
 		PhoneID:           uint(phoneID),
