@@ -328,6 +328,12 @@ func isPhoneInputDataValid(c *gin.Context, data phoneInput) bool {
 	return true
 }
 
+type Phones struct {
+	models.Phone
+	BrandName string `json:"brand_name"`
+	BrandLogo string `json:"brand_logo"`
+}
+
 // Get phones specification by phone ID godoc
 // @Summary Get specification data by Phone id. (PUBLIC)
 // @Description Get Phone specifiction data by phone id. if phone's specification data empty, the spec data will not be displayed
@@ -337,17 +343,21 @@ func isPhoneInputDataValid(c *gin.Context, data phoneInput) bool {
 // @Success 200 {object} []models.Phone
 // @Router /phones/{id}/specification [get]
 func GetPhonesSpecByPhoneId(c *gin.Context) {
-	var phones []models.Phone
+	var phone Phones
 
 	db := c.MustGet("db").(*gorm.DB)
 
 	id := c.Param("id")
-	if err := db.Preload("Specifications").Find(&phones, id).Error; err != nil {
+	if err := db.Preload("Specifications").
+		Select("phones.*, brands.logo_url as brand_logo, brands.name as brand_name").
+		Joins("join brands on phones.brand_id = brands.id").
+		Where("phones.id = ?", id).
+		First(&phone).Error; err != nil {
 		fmt.Println(err.Error())
 		c.JSON(http.StatusNotFound,
 			utils.ResponseJSON(lib.ErrMsgNotFound("phone"), http.StatusNotFound, nil))
 		return
 	}
 
-	c.JSON(http.StatusOK, utils.ResponseJSON("", http.StatusOK, phones))
+	c.JSON(http.StatusOK, utils.ResponseJSON("", http.StatusOK, phone))
 }
