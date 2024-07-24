@@ -1523,9 +1523,8 @@ paths:
       - Users
   /users/{id}/profile:
     get:
-      description: Get all Users profile data by user id.this will only display account
-        with role "user", if  user not create profile yet the profile will not be
-        display
+      description: Get all Users profile data by user id., if  user not create profile
+        yet the profile will not be display
       parameters:
       - description: user id
         in: path
