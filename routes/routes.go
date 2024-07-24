@@ -113,7 +113,6 @@ func SetupRouter(db *gorm.DB, r *gin.Engine) {
 	phonesMiddlewareRoutes.Use(middleware.JwtAuthMiddleware())
 	// ⬇ logged in account only (user/admin)
 	phonesMiddlewareRoutes.POST("/:id/reviews", controller.CreateReview)
-	phonesMiddlewareRoutes.PUT("/:id/reviews", controller.UpdateReview)
 	// ⬇ ADMIN ONLY
 	phonesMiddlewareRoutes.Use(middleware.RoleMiddleware(db))
 	phonesMiddlewareRoutes.POST("", controller.CreatePhoneData)
@@ -130,6 +129,7 @@ func SetupRouter(db *gorm.DB, r *gin.Engine) {
 	reviewsMiddlewareRoutes.DELETE("/:id", controller.DeleteReviewById)
 	reviewsMiddlewareRoutes.POST("/:id/comments", controller.CreateComment)
 	reviewsMiddlewareRoutes.PUT("/:id/comments/:com_id", controller.UpdateComment)
+	reviewsMiddlewareRoutes.PUT("/:id", controller.UpdateReview)
 	reviewsMiddlewareRoutes.Use(middleware.RoleMiddleware(db))
 	reviewsMiddlewareRoutes.GET("", controller.GetAllReviews)
 

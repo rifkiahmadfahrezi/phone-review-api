@@ -909,38 +909,6 @@ paths:
       summary: Create New Review
       tags:
       - Phones
-    put:
-      description: This route will update review data , user ID is taken from the
-        JWT token
-      parameters:
-      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: phone id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: example JSON body to update a review for phone
-        in: body
-        name: Body
-        required: true
-        schema:
-          $ref: '#/definitions/controller.reviewInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Review'
-      security:
-      - BearerToken: []
-      summary: Update Review for phone
-      tags:
-      - Phones
   /phones/{id}/specification:
     get:
       description: Get Phone specifiction data by phone id. if phone's specification
@@ -1136,6 +1104,38 @@ paths:
       security:
       - BearerToken: []
       summary: Delete review by ID
+      tags:
+      - Reviews
+    put:
+      description: This route will update review data , user ID is taken from the
+        JWT token
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: review id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: example JSON body to update a review for phone
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.reviewInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Review'
+      security:
+      - BearerToken: []
+      summary: Update Review for phone
       tags:
       - Reviews
   /reviews/{id}/comments:

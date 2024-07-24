@@ -96,7 +96,7 @@ func CreateReview(c *gin.Context) {
 	// jika data ditemukan berarti user sudah memberikan review terhadap phone ini
 	// dan user tidak boleh menambahkan reviewnya
 	if len(rev) > 0 {
-		msg := fmt.Sprintf("anda sudah memberikan review ke phone ini", userID, phoneID)
+		msg := "anda sudah memberikan review ke phone ini"
 		c.JSON(http.StatusBadRequest,
 			utils.ResponseJSON(msg, http.StatusBadRequest, nil))
 		return
@@ -117,14 +117,14 @@ func CreateReview(c *gin.Context) {
 // Update Review for phone godoc
 // @Summary Update Review for phone
 // @Description This route will update review data , user ID is taken from the JWT token
-// @Tags Phones
+// @Tags Reviews
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
 // @Security BearerToken
-// @Param id path string true "phone id"
+// @Param id path string true "review id"
 // @Param Body body reviewInput true "example JSON body to update a review for phone"
 // @Produce json
 // @Success 200 {object} models.Review
-// @Router /phones/{id}/reviews [put]
+// @Router /reviews/{id} [put]
 func UpdateReview(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
@@ -139,7 +139,7 @@ func UpdateReview(c *gin.Context) {
 		return
 	}
 
-	phoneID := c.Param("id")
+	reviewID := c.Param("id")
 
 	// user id dari token
 	userID, err := token.ExtractTokenID(c)
@@ -149,22 +149,15 @@ func UpdateReview(c *gin.Context) {
 		return
 	}
 
-	// cek jika user sudah memberi review atau blm
+	// cek data review ada atau tdk dan milik user yg login
 	var rev models.Review
-	if err := db.Where("user_id = ?", userID).First(&rev).Error; err != nil {
+	if err := db.Where("id = ? AND user_id = ?", reviewID, userID).First(&rev).Error; err != nil {
 		c.JSON(http.StatusNotFound,
-			utils.ResponseJSON("user ini belum memberikan review", http.StatusNotFound, nil))
+			utils.ResponseJSON("Review tidak ditemukan atau bukan milik user", http.StatusNotFound, nil))
 		return
 	}
 
-	// cek data phone ada atau tdk
-	if err := db.Where("phone_id = ?", phoneID).First(&rev).Error; err != nil {
-		c.JSON(http.StatusBadRequest,
-			utils.ResponseJSON(err.Error(), http.StatusBadRequest, nil))
-		return
-	}
-
-	// Update yg diinput saja
+	// Update yang diinput saja
 	if input.Rating != 0 {
 		rev.Rating = input.Rating
 	}
@@ -172,14 +165,9 @@ func UpdateReview(c *gin.Context) {
 		rev.Content = input.Content
 	}
 
-	var updated_data reviewUpdate
-
-	updated_data.Content = rev.Content
-	updated_data.Rating = rev.Rating
-
 	rev.UpdatedAt = time.Now()
 
-	if err := db.Model(&models.Review{}).Where("user_id = ?", userID).Updates(&updated_data).Error; err != nil {
+	if err := db.Save(&rev).Error; err != nil {
 		c.JSON(http.StatusInternalServerError,
 			utils.ResponseJSON("Failed to update review", http.StatusInternalServerError, nil))
 		return
