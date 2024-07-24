@@ -222,6 +222,11 @@ func GetAllReviews(c *gin.Context) {
 	c.JSON(http.StatusOK, utils.ResponseJSON("", http.StatusOK, data))
 }
 
+type Reviews struct {
+	models.Review
+	Username string `json:"username"`
+}
+
 // Get reviews data by Phone data ID godoc
 // @Summary Get reviews data by Phone id. (PUBLIC)
 // @Description Get all Reviews data by phone id. if reviews data is empty, the review data will not be displayed
@@ -231,19 +236,23 @@ func GetAllReviews(c *gin.Context) {
 // @Success 200 {object} []models.Phone
 // @Router /phones/{id}/reviews [get]
 func GetReviewsDataByPhoneId(c *gin.Context) {
-	var phones []models.Phone
+	var reviews []Reviews
 
 	db := c.MustGet("db").(*gorm.DB)
 
 	id := c.Param("id")
-	if err := db.Preload("Reviews").Find(&phones, id).Error; err != nil {
+	if err := db.Table("reviews").
+		Select("reviews.*, users.username as username").
+		Joins("join users on reviews.user_id = users.id").
+		Where("reviews.phone_id = ?", id).
+		Find(&reviews).Error; err != nil {
 		fmt.Println(err.Error())
 		c.JSON(http.StatusNotFound,
-			utils.ResponseJSON(lib.ErrMsgNotFound("phone"), http.StatusNotFound, nil))
+			utils.ResponseJSON(err.Error(), http.StatusNotFound, nil))
 		return
 	}
 
-	c.JSON(http.StatusOK, utils.ResponseJSON("", http.StatusOK, phones))
+	c.JSON(http.StatusOK, utils.ResponseJSON("", http.StatusOK, reviews))
 }
 
 // Delete account
