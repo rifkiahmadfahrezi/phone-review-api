@@ -96,7 +96,7 @@ func CreateReview(c *gin.Context) {
 	// jika data ditemukan berarti user sudah memberikan review terhadap phone ini
 	// dan user tidak boleh menambahkan reviewnya
 	if len(rev) > 0 {
-		msg := fmt.Sprintf("user (%d) sudah memberikan review ke phone (%d)", userID, phoneID)
+		msg := fmt.Sprintf("anda sudah memberikan review ke phone ini", userID, phoneID)
 		c.JSON(http.StatusBadRequest,
 			utils.ResponseJSON(msg, http.StatusBadRequest, nil))
 		return
