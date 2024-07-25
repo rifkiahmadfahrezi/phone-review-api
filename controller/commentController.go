@@ -180,7 +180,7 @@ func GetCommentsDataByReviewId(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
 	id := c.Param("id")
-	if err := db.Preload("Comments").Find(&reviews, id).Error; err != nil {
+	if err := db.Preload("Comments.User").Preload("User").Find(&reviews, id).Error; err != nil {
 		c.JSON(http.StatusInternalServerError,
 			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
 		return
@@ -192,7 +192,38 @@ func GetCommentsDataByReviewId(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, utils.ResponseJSON("", http.StatusOK, reviews))
+	var response []map[string]interface{}
+	for _, review := range reviews {
+		r := map[string]interface{}{
+			"id":         review.ID,
+			"rating":     review.Rating,
+			"content":    review.Content,
+			"username":   review.User.Username,
+			"created_at": review.CreatedAt,
+			"updated_at": review.UpdatedAt,
+			"user_id":    review.UserID,
+			"phone_id":   review.PhoneID,
+		}
+
+		var comments []map[string]interface{}
+		for _, comment := range review.Comments {
+			c := map[string]interface{}{
+				"id":         comment.ID,
+				"content":    comment.Content,
+				"username":   comment.User.Username,
+				"created_at": comment.CreatedAt,
+				"updated_at": comment.UpdatedAt,
+				"user_id":    comment.UserID,
+				"review_id":  comment.ReviewID,
+			}
+			comments = append(comments, c)
+		}
+
+		r["comments"] = comments
+		response = append(response, r)
+	}
+
+	c.JSON(http.StatusOK, utils.ResponseJSON("", http.StatusOK, response))
 }
 
 // Delete Comment by id  godoc
