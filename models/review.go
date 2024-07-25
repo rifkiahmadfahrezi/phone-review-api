@@ -13,4 +13,5 @@ type Review struct {
 	UserID    uint      `gorm:"not null" json:"user_id"`
 	PhoneID   uint      `gorm:"not null" json:"phone_id"`
 	Comments  []Comment `gorm:"foreignKey:ReviewID;constraint:onDelete:CASCADE" json:"comments,omitempty"`
+	User      User      `json:"user"`
 }

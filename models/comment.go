@@ -11,4 +11,5 @@ type Comment struct {
 	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 	UserID    uint      `gorm:"not null" json:"user_id"`
 	ReviewID  uint      `gorm:"not null" json:"review_id"`
+	User      User      `json:"user"`
 }
