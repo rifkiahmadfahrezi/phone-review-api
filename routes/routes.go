@@ -136,6 +136,7 @@ func SetupRouter(db *gorm.DB, r *gin.Engine) {
 	commentMiddlewareRoutes := r.Group("/comments")
 	commentMiddlewareRoutes.Use(middleware.JwtAuthMiddleware())
 	commentMiddlewareRoutes.DELETE("/:id", controller.DeleteCommentByID)
+	commentMiddlewareRoutes.PUT("/:id", controller.UpdateComment)
 
 	// dashboard routes (ADMIN ONLY)
 	dashboardMiddlewareRoutes := r.Group("/dashboard")

@@ -90,15 +90,14 @@ func CreateComment(c *gin.Context) {
 // Update Comment godoc
 // @Summary Update Comment on a review
 // @Description This route will update comment data, will only be able to update data related to the logged in user (user ID is taken from the JWT token)
-// @Tags Reviews
+// @Tags Comments
 // @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
 // @Security BearerToken
-// @Param id path string true "review id"
-// @Param com_id path string true "comment id"
+// @Param id path string true "comment id"
 // @Param Body body commentInput true "example JSON body to update a comment, user_id is taken from the authorization token"
 // @Produce json
 // @Success 200 {object} models.Comment
-// @Router /reviews/{id}/comments/{com_id} [put]
+// @Router /comments/{id} [put]
 func UpdateComment(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
@@ -113,8 +112,14 @@ func UpdateComment(c *gin.Context) {
 		return
 	}
 
-	reviewID := c.Param("id")
-	commentID := c.Param("com_id")
+	commentID := c.Param("id")
+
+	// cek komen berdasarkan ID
+	if err := db.Where("id = ?", commentID).First(&models.Comment{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError,
+			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
+		return
+	}
 
 	// user id dari token
 	userID, err := token.ExtractTokenID(c)
@@ -139,13 +144,6 @@ func UpdateComment(c *gin.Context) {
 			utils.ResponseJSON(msg, http.StatusNotFound, nil))
 		return
 	}
-	// cek data review ada atau tdk
-	if err := db.Where("review_id = ? AND user_id = ?", reviewID, userID).Find(&rev).Error; err != nil {
-		msg := fmt.Sprintf("review dgn ID (%s) dari user (%d) tidak ditemukan", reviewID, userID)
-		c.JSON(http.StatusNotFound,
-			utils.ResponseJSON(msg, http.StatusNotFound, nil))
-		return
-	}
 
 	// Update yg diinput saja
 	if input.Content != "" {
@@ -157,7 +155,7 @@ func UpdateComment(c *gin.Context) {
 
 	rev.UpdatedAt = time.Now()
 
-	if err := db.Model(&models.Comment{}).Where("user_id = ? AND review_id = ? AND id = ?", userID, reviewID, commentID).Updates(&updated_data).Error; err != nil {
+	if err := db.Model(&models.Comment{}).Where("user_id = ? AND id = ?", userID, commentID).Updates(&updated_data).Error; err != nil {
 		c.JSON(http.StatusInternalServerError,
 			utils.ResponseJSON("Failed to update review", http.StatusInternalServerError, nil))
 		return

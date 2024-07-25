@@ -159,6 +159,8 @@ definitions:
         type: integer
       updated_at:
         type: string
+      user:
+        $ref: '#/definitions/models.User'
       user_id:
         type: integer
     type: object
@@ -226,6 +228,8 @@ definitions:
         type: integer
       updated_at:
         type: string
+      user:
+        $ref: '#/definitions/models.User'
       user_id:
         type: integer
     type: object
@@ -706,6 +710,39 @@ paths:
       security:
       - BearerToken: []
       summary: Delete Comment by id .
+      tags:
+      - Comments
+    put:
+      description: This route will update comment data, will only be able to update
+        data related to the logged in user (user ID is taken from the JWT token)
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: comment id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: example JSON body to update a comment, user_id is taken from
+          the authorization token
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.commentInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Comment'
+      security:
+      - BearerToken: []
+      summary: Update Comment on a review
       tags:
       - Comments
   /dashboard/all-count-data:
@@ -1190,45 +1227,6 @@ paths:
       security:
       - BearerToken: []
       summary: Create Comment on a review
-      tags:
-      - Reviews
-  /reviews/{id}/comments/{com_id}:
-    put:
-      description: This route will update comment data, will only be able to update
-        data related to the logged in user (user ID is taken from the JWT token)
-      parameters:
-      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: review id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: comment id
-        in: path
-        name: com_id
-        required: true
-        type: string
-      - description: example JSON body to update a comment, user_id is taken from
-          the authorization token
-        in: body
-        name: Body
-        required: true
-        schema:
-          $ref: '#/definitions/controller.commentInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Comment'
-      security:
-      - BearerToken: []
-      summary: Update Comment on a review
       tags:
       - Reviews
   /roles:

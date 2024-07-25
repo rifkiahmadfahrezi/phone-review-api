@@ -605,6 +605,54 @@ const docTemplate = `{
             }
         },
         "/comments/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "This route will update comment data, will only be able to update data related to the logged in user (user ID is taken from the JWT token)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Update Comment on a review",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "comment id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "example JSON body to update a comment, user_id is taken from the authorization token",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.commentInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Comment"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "security": [
                     {
@@ -1353,63 +1401,6 @@ const docTemplate = `{
                     },
                     {
                         "description": "example JSON body to create a comment, user_id is taken from the authorization token",
-                        "name": "Body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/controller.commentInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Comment"
-                        }
-                    }
-                }
-            }
-        },
-        "/reviews/{id}/comments/{com_id}": {
-            "put": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "This route will update comment data, will only be able to update data related to the logged in user (user ID is taken from the JWT token)",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Reviews"
-                ],
-                "summary": "Update Comment on a review",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Authorization : 'Bearer \u003cinsert_your_token_here\u003e'",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "review id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "comment id",
-                        "name": "com_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "example JSON body to update a comment, user_id is taken from the authorization token",
                         "name": "Body",
                         "in": "body",
                         "required": true,
@@ -2218,6 +2209,9 @@ const docTemplate = `{
                 "updated_at": {
                     "type": "string"
                 },
+                "user": {
+                    "$ref": "#/definitions/models.User"
+                },
                 "user_id": {
                     "type": "integer"
                 }
@@ -2319,6 +2313,9 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.User"
                 },
                 "user_id": {
                     "type": "integer"
