@@ -334,7 +334,7 @@ func GetUserReviewByID(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
 	userID := c.Param("id")
-	if err := db.Preload("Reviews").Where("role_id != 2").Find(&user, userID).Error; err != nil {
+	if err := db.Preload("Reviews").Find(&user, userID).Error; err != nil {
 		c.JSON(http.StatusNotFound,
 			utils.ResponseJSON(lib.ErrMsgNotFound("user"), http.StatusNotFound, nil))
 		return
