@@ -20,7 +20,7 @@ type deleteUserInput struct {
 
 type userUpdate struct {
 	Username string `json:"username"`
-	Email    string `json:"email" binding:"email"`
+	Email    string `json:"email"`
 }
 
 type RoleNameData struct {
@@ -239,8 +239,14 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	var updated_data models.User
-	updated_data.Username = input.Username
-	updated_data.Email = input.Email
+
+	if input.Username != "" {
+		updated_data.Username = input.Username
+	}
+
+	if input.Email != "" {
+		updated_data.Email = input.Email
+	}
 
 	// cek username sudah ada atau belum
 	var user_exist []models.User
