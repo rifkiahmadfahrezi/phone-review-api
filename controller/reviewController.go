@@ -258,29 +258,23 @@ func DeleteReviewById(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
 	reviewID := c.Param("id")
-	// user id dari token
-	userID, err := token.ExtractTokenID(c)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError,
-			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
-		return
-	}
+
 	var review []models.Review
 	// cek apakah review dengan id tsb ada
-	if err := db.Where("id = ? AND user_id = ?", reviewID, userID).Find(&review).Error; err != nil {
+	if err := db.Where("id = ?", reviewID).Find(&review).Error; err != nil {
 		c.JSON(http.StatusInternalServerError,
 			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
 		return
 	}
 
 	if len(review) == 0 {
-		msg := fmt.Sprintf("data review(%s) dari user (%d) tidak ditemukan", reviewID, userID)
+		msg := "data review tidak ditemukan"
 		c.JSON(http.StatusNotFound,
 			utils.ResponseJSON(msg, http.StatusNotFound, nil))
 		return
 	}
 
-	if err := db.Model(&models.Review{}).Where("id = ? AND user_id = ?", reviewID, userID).Delete(&review).Error; err != nil {
+	if err := db.Model(&models.Review{}).Where("id = ?", reviewID).Delete(&review).Error; err != nil {
 		c.JSON(http.StatusBadRequest,
 			utils.ResponseJSON(err.Error(), http.StatusBadRequest, nil))
 		return
