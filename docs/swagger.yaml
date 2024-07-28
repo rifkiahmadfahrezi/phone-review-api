@@ -768,6 +768,34 @@ paths:
       summary: Update Comment on a review
       tags:
       - Comments
+  /comments/{id}/admin:
+    delete:
+      description: Delete a Comment by id,
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Comment id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+      security:
+      - BearerToken: []
+      summary: Delete Comment by id (ADMIN ONLY).
+      tags:
+      - Comments
   /dashboard/all-count-data:
     get:
       description: Get a number of all data
