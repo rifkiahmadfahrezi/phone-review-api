@@ -683,6 +683,29 @@ paths:
       summary: Get phones data by Brand id. (PUBLIC)
       tags:
       - Brands
+  /comments:
+    get:
+      description: Get all of comments data.
+      parameters:
+      - description: 'Authorization : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Comment'
+            type: array
+      security:
+      - BearerToken: []
+      summary: Get all Phones comments. (ADMIN ONLY)
+      tags:
+      - Comments
   /comments/{id}:
     delete:
       description: Delete a Comment by id, (user ID is taken from the JWT token so

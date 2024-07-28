@@ -238,16 +238,8 @@ func DeleteCommentByID(c *gin.Context) {
 
 	db := c.MustGet("db").(*gorm.DB)
 
-	userID, err := token.ExtractTokenID(c)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError,
-			utils.ResponseJSON("gagal medapatkan user id", http.StatusInternalServerError, nil))
-		return
-	}
-
 	var comment_data models.Comment
-	if err := db.Where("id = ? AND user_id = ? ", c.Param("id"), userID).First(&comment_data).Error; err != nil {
+	if err := db.Where("id = ?", c.Param("id")).First(&comment_data).Error; err != nil {
 		c.JSON(http.StatusBadRequest,
 			utils.ResponseJSON(lib.ErrMsgNotFound("comment"), http.StatusBadRequest, nil))
 		return
@@ -260,4 +252,30 @@ func DeleteCommentByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, utils.ResponseJSON(lib.MsgDeleted("comment"), http.StatusOK, nil))
+}
+
+// Get all phone comments
+// @Summary Get all Phones comments. (ADMIN ONLY)
+// @Description Get all of comments data.
+// @Tags Comments
+// @Param Authorization header string true "Authorization : 'Bearer <insert_your_token_here>'"
+// @Security BearerToken
+// @Produce json
+// @Success 200 {object} []models.Comment
+// @Router /comments [get]
+func GetAllCommentData(c *gin.Context) {
+	// get db from gin context
+	db := c.MustGet("db").(*gorm.DB)
+	var comments_data []models.Comment
+
+	err := db.Preload("User").Find(&comments_data).Error
+	if err != nil {
+		emptydata := make([]string, 0)
+		c.JSON(http.StatusInternalServerError,
+			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, emptydata))
+		return
+	}
+
+	c.JSON(http.StatusOK,
+		utils.ResponseJSON("", http.StatusOK, comments_data))
 }
