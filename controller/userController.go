@@ -155,7 +155,11 @@ func DeleteMyAccount(c *gin.Context) {
 			utils.ResponseJSON("password salah, gagal menghapus akun", http.StatusBadRequest, nil))
 		return
 	}
-	db.Delete(&user)
+	if err := db.Delete(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError,
+			utils.ResponseJSON(err.Error(), http.StatusInternalServerError, nil))
+		return
+	}
 	c.JSON(http.StatusOK,
 		utils.ResponseJSON(lib.MsgDeleted("user"), http.StatusOK, nil))
 }
