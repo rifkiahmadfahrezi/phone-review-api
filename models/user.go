@@ -4,7 +4,6 @@ import (
 	"errors"
 	"final-project/lib"
 	"final-project/utils/token"
-	"fmt"
 	"html"
 	"strings"
 	"time"
@@ -31,33 +30,29 @@ func VerifyPassword(password, hashedPassword string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
-func LoginCheck(username, email string, password string, db *gorm.DB) (string, error) {
-
+func LoginCheck(username, email string, password string, db *gorm.DB) (uint, string, error) {
 	var err error
-
 	u := User{}
 
+	// Cek apakah user ada di database
 	err = db.Model(User{}).Where("username = ? OR email = ?", username, email).Take(&u).Error
-
 	if err != nil {
-		return "", err
+		return 0, "", err
 	}
 
+	// Verifikasi password
 	err = VerifyPassword(password, u.Password)
-
-	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return "", err
-	}
-
-	token, err := token.GenerateToken(u.ID)
-
-	fmt.Println("Token:", token)
-
 	if err != nil {
-		return "", err
+		return 0, "", err
 	}
 
-	return token, nil
+	// Generate token
+	accessToken, err := token.GenerateToken(u.ID)
+	if err != nil {
+		return 0, "", err
+	}
+
+	return u.ID, accessToken, nil
 }
 
 func HashPassword(password_text string) (string, error) {

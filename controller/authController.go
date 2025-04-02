@@ -6,7 +6,6 @@ import (
 	"final-project/models"
 	"final-project/utils"
 	"final-project/utils/token"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -51,34 +50,40 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	u := models.User{}
+	u := models.User{
+		Username: input.Username,
+		Email:    input.Email,
+		Password: input.Password,
+	}
 
-	u.Username = input.Username
-	u.Email = input.Email
-	u.Password = input.Password
-
-	token, err := models.LoginCheck(u.Username, u.Email, u.Password, db)
-
+	// Cek login dan dapatkan userID + access token
+	userID, access_token, err := models.LoginCheck(u.Username, u.Email, u.Password, db)
 	if err != nil {
-		fmt.Println(err)
 		c.JSON(http.StatusBadRequest, utils.ResponseJSON("Username atau password salah", http.StatusBadRequest, nil))
 		return
 	}
 
-	// get user info
-	var user User
-
-	if err := db.Select("id", "username", "email").Where("username = ? OR email = ?", u.Username, u.Email).First(&user).Error; err != nil {
-		c.JSON(http.StatusBadRequest,
-			utils.ResponseJSON(err.Error(), http.StatusBadRequest, nil))
+	// Generate refresh token
+	refresh_token, err := token.GenerateRefreshToken(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ResponseJSON("Gagal membuat refresh token", http.StatusInternalServerError, nil))
 		return
 	}
 
-	c.JSON(http.StatusOK, utils.ResponseJSON("Login berhasil", http.StatusOK, map[string]any{
-		"user":  user,
-		"token": token,
-	}))
+	// Ambil informasi user
+	var user models.User
+	if err := db.Select("id", "username", "email").Where("id = ?", userID).First(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ResponseJSON("Gagal mengambil data user", http.StatusInternalServerError, nil))
+		return
+	}
 
+	// Set refresh token ke HTTP-only cookie
+	c.SetCookie("refresh_token", refresh_token, 7*24*3600, "/", "localhost", false, true) // Expire dalam 7 hari
+
+	c.JSON(http.StatusOK, utils.ResponseJSON("Login berhasil", http.StatusOK, map[string]any{
+		"user":         user,
+		"access_token": access_token,
+	}))
 }
 
 // Register godoc
@@ -212,9 +217,17 @@ func ChangePassword(c *gin.Context) {
 // @Router /auth/logout [post]
 func Logout(c *gin.Context) {
 	domain := c.Request.Host
-	c.SetCookie("Authorization", "", -1, "/", domain, false, true)
 
-	c.JSON(http.StatusOK, utils.ResponseJSON("Logout berhasil", http.StatusSeeOther, nil))
+	// Hapus cookie refresh_token dengan mengatur waktu kedaluwarsa negatif
+	c.SetCookie("refresh_token", "", -1, "/", domain, false, true)
+
+	// Periksa apakah cookie berhasil dihapus
+	_, err := c.Cookie("refresh_token")
+	success := err != nil // Jika error (cookie tidak ditemukan), berarti berhasil logout
+
+	c.JSON(http.StatusOK, utils.ResponseJSON("Logout berhasil", http.StatusOK, map[string]bool{
+		"success": success,
+	}))
 }
 
 func GetUserRoleId(c *gin.Context) (uint, error) {

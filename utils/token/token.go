@@ -79,6 +79,37 @@ func ExtractTokenID(c *gin.Context) (uint, error) {
 	return 0, nil
 }
 
+func GenerateTokenPair(user_id uint) (string, string, error) {
+	// Generate access token
+	accessToken, err := GenerateToken(user_id)
+	if err != nil {
+		return "", "", err
+	}
+
+	// Generate refresh token
+	refreshToken, err := GenerateRefreshToken(user_id)
+	if err != nil {
+		return "", "", err
+	}
+
+	return accessToken, refreshToken, nil
+}
+
+func GenerateRefreshToken(user_id uint) (string, error) {
+	refreshTokenLifespan, err := strconv.Atoi(utils.GetEnv("REFRESH_TOKEN_HOUR_LIFESPAN", "168")) // Default: 7 hari
+
+	if err != nil {
+		return "", err
+	}
+
+	claims := jwt.MapClaims{}
+	claims["user_id"] = user_id
+	claims["exp"] = time.Now().Add(time.Hour * time.Duration(refreshTokenLifespan)).Unix()
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	return token.SignedString([]byte(API_SECRET))
+}
+
 // func ExtractTokeRoleID(c *gin.Context) (uint, error) {
 
 // 	tokenString := ExtractToken(c)

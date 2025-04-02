@@ -3,6 +3,8 @@ package routes
 import (
 	"final-project/controller"
 	"final-project/middleware"
+	"final-project/utils"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -14,14 +16,20 @@ import (
 
 func SetupRouter(db *gorm.DB, r *gin.Engine) {
 
+	FE_DOMAIN := utils.GetEnv("FRONTEND_DOMAIN", "http://localhost:3000")
+
 	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowAllOrigins = true
-	corsConfig.AllowHeaders = []string{"Content-Type", "X-XSRF-TOKEN", "Accept", "Origin", "X-Requested-With", "Authorization"}
+	corsConfig.AllowAllOrigins = false
+	corsConfig.AllowOrigins = []string{FE_DOMAIN}
+	corsConfig.AllowCredentials = true
+	corsConfig.MaxAge = 12 * time.Hour
+	corsConfig.AllowHeaders = []string{
+		"Content-Type", "X-XSRF-TOKEN", "Accept", "Origin", "X-Requested-With", "Authorization",
+	}
 
 	// To be able to send tokens to the server.
 	corsConfig.AllowCredentials = true
-	// OPTIONS method for ReactJS
-	corsConfig.AddAllowMethods("OPTIONS")
+	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
 
 	r.Use(cors.New(corsConfig))
 
